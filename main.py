@@ -29,10 +29,11 @@ if __name__ == '__main__':
     running = True
     #start_screen(screen)
     player = generate_level(load_level('map.txt'))
-    fon = pygame.transform.scale(load_image('field.jpg'), (CELL_SIZE * 28, CELL_SIZE * 31))
+    #fon = pygame.transform.scale(load_image('field.jpg'), (CELL_SIZE * 28, CELL_SIZE * 31))
     while running:
-        screen.blit(fon, (0, 0))
-        draw_rect()
+        #screen.blit(fon, (0, 0))
+        #draw_rect()
+        screen.fill(BLACK)
         events()
         all_sprites.update()
         all_sprites.draw(screen)
