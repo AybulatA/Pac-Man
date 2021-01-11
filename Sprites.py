@@ -12,7 +12,7 @@ tile_images = {
 class Border(pygame.sprite.Sprite):
     def __init__(self, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
-        self.image = pygame.transform.scale(load_image('field.jpg', colorkey=BLACK), (CELL_SIZE * 28, CELL_SIZE * 31))
+        self.image = pygame.transform.scale(load_image('field.jpg', colorkey=BLACK).convert_alpha(), (CELL_SIZE * 28, CELL_SIZE * 31))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 

@@ -53,6 +53,5 @@ class PacMan(pygame.sprite.Sprite):
             self.score += 10
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
             self.score += 50
-        print(self.score)
 
 
