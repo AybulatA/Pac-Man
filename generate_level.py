@@ -10,6 +10,6 @@ def generate_level(level):
                 Food(x, y, foods_group, all_sprites)
             elif level[y][x] == '0':
                 Energizer(x, y, energizers_group, all_sprites)
-    Border(borders_group, all_sprites)
-    player = PacMan(30, 10, player_group, all_sprites)
-    return player
+    border = Border(borders_group, all_sprites)
+    player = PacMan(12, 22, player_group, all_sprites, border, level)
+    return player, border

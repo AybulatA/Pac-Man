@@ -17,9 +17,6 @@ score = 0
 
 CELL_SIZE = 30
 
-CELL_SIZE_X = CELL_SIZE
-CELL_SIZE_Y = CELL_SIZE
-
 RIGHT = pygame.K_RIGHT
 LEFT = pygame.K_LEFT
 DOWN = pygame.K_DOWN
