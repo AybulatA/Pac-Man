@@ -12,7 +12,8 @@ tile_images = {
 class Border(pygame.sprite.Sprite):
     def __init__(self, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
-        self.image = pygame.transform.scale(load_image('field.jpg', colorkey=BLACK), (CELL_SIZE * 28, CELL_SIZE * 31))
+        self.image = pygame.transform.scale(load_image('field.jpg', colorkey=BLACK),
+                                            (CELL_SIZE * 28, CELL_SIZE * 31))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -23,7 +24,7 @@ class Food(pygame.sprite.Sprite):
         self.image = pygame.Surface([4, 4])
         pygame.draw.rect(self.image, FOODS_COLOR, (0, 0, 4, 4))
         self.rect = self.image.get_rect().move(
-            CELL_SIZE * pos_x + CELL_SIZE // 2, CELL_SIZE * pos_y + CELL_SIZE // 2)
+            CELL_SIZE * pos_x + CELL_SIZE // 2 - 2, CELL_SIZE * pos_y + CELL_SIZE // 2 - 2)
 
 
 class Energizer(pygame.sprite.Sprite):

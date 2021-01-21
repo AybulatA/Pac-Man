@@ -17,6 +17,9 @@ score = 0
 
 CELL_SIZE = 30
 
+#field size, for tunnel
+LEN_X = CELL_SIZE * 27
+
 RIGHT = pygame.K_RIGHT
 LEFT = pygame.K_LEFT
 DOWN = pygame.K_DOWN
