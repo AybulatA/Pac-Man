@@ -3,8 +3,11 @@ import sys
 from global_names import *
 
 
-def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
+def load_image(name, colorkey=None, key_path=None):
+    path = 'data'
+    if key_path is not None:
+        path += '/' + key_path
+    fullname = os.path.join(path, name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
@@ -51,8 +54,6 @@ def possible_keys(obj):
     pos_x = obj.rect.x + CELL_SIZE // 2
     pos_y = obj.rect.y + CELL_SIZE // 2
 
-    #print(pos_x % CELL_SIZE, pos_y % CELL_SIZE)
-
     acts = {
         RIGHT: (pos_x + actions[RIGHT][0] + int(CELL_SIZE * 1.5) - coeff * 7,
                 pos_y + actions[RIGHT][1]),
@@ -69,10 +70,42 @@ def possible_keys(obj):
         y_cell = (value[1]) // CELL_SIZE
         if MAP[y_cell][x_cell] in ['.', ' ', '0']:
             if key in [UP, DOWN]:
-                if pos_x % CELL_SIZE != 8 and (pos_x + 2) % CELL_SIZE != 8:
+                if pos_x % CELL_SIZE not in [6, 8]:
                     continue
             else:
-                if pos_y % CELL_SIZE != 8 and (pos_y + 2) % CELL_SIZE != 8:
+                if pos_y % CELL_SIZE not in [6, 8]:
                     continue
             ans.append(key)
     return ans
+
+
+def load_and_resize_sprites(name):
+    sprites = {
+        UP: [load_image('up(first).png', colorkey=BLACK, key_path=name),
+             load_image('up(second).png', colorkey=BLACK, key_path=name)],
+        RIGHT: [load_image('right(first).png', colorkey=BLACK, key_path=name),
+                load_image('right(second).png', colorkey=BLACK, key_path=name)]
+    }
+    if name == 'Pac-Man':
+        sprites[DOWN] = [pygame.transform.flip(sprites[UP][0], False, True),
+                         pygame.transform.flip(sprites[UP][1], False, True)]
+
+        sprites[LEFT] = [pygame.transform.flip(sprites[RIGHT][0], True, False),
+                         pygame.transform.flip(sprites[RIGHT][1], True, False)]
+
+        sprites['start_image'] = [load_image('start.png',
+                                             colorkey=BLACK, key_path=name)]
+    else:
+        sprites[DOWN] = [load_image('down(first).png', colorkey=BLACK, key_path=name),
+                         load_image('down(second).png', colorkey=BLACK, key_path=name)]
+
+        sprites[LEFT] = [load_image('left(first).png', colorkey=BLACK, key_path=name),
+                         load_image('left(second).png', colorkey=BLACK, key_path=name)]
+
+    #changing size of images
+    for i in sprites.keys():
+        for j in range(len(sprites[i])):
+            el = sprites[i][j]
+            sprites[i][j] = pygame.transform.scale(el, (int(CELL_SIZE * 1.5),
+                                                        int(CELL_SIZE * 1.5)))
+    return sprites

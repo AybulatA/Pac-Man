@@ -2,13 +2,6 @@ from tools import load_image
 from global_names import *
 
 
-tile_images = {
-    #'house': load_image('house_type21_NW.png'),
-    #'road': load_image('driveway_long_SE.png'),
-    #'player': load_image('be819cfceb34c029ee5764071deb1efb.png')
-}
-
-
 class Border(pygame.sprite.Sprite):
     def __init__(self, first_gr, second_gr):
         super().__init__(first_gr, second_gr)

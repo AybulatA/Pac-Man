@@ -7,12 +7,13 @@ borders_group = pygame.sprite.Group()
 foods_group = pygame.sprite.Group()
 energizers_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+enemy_groups = pygame.sprite.Group()
 
 #screen options
 WIDTH, HEIGHT = 1600, 1000
 FPS = 60
 
-SPEED = 2
+SPEED = 3
 score = 0
 
 CELL_SIZE = 30
@@ -32,6 +33,12 @@ actions = {
     UP: (-SPEED, 0),
 }
 
+opposite_keys = {
+    RIGHT: LEFT,
+    UP: DOWN,
+    DOWN: UP,
+    LEFT: RIGHT
+}
 
 #colors
 BLACK = pygame.Color('black')
