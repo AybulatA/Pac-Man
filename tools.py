@@ -109,3 +109,43 @@ def load_and_resize_sprites(name):
             sprites[i][j] = pygame.transform.scale(el, (int(CELL_SIZE * 1.5),
                                                         int(CELL_SIZE * 1.5)))
     return sprites
+
+
+def targeting(obj, target, keys, pos):
+    #ghosts on these cells cannot turn up
+    if pos in [(12, 11), (15, 11), (15, 23), (12, 23)]:
+        if UP in keys:
+            keys.remove(UP)
+            obj.action = keys[0]
+
+    ans = list()
+
+    for i in keys:
+        if i in VERTICAL:
+            x = (-1) ** VERTICAL.index(i) + pos[0]
+            y = pos[1]
+        else:
+            x = pos[0]
+            y = (-1) ** HORIZONTAL.index(i) + pos[1]
+        line = (abs(target[0] - x) ** 2 + abs(target[1] - y) ** 2) ** 0.5
+        ans.append((i, (x, y), line))
+
+    ans = sorted(ans, key=lambda z: z[-1])
+
+    if ans[0][-1] == ans[-1][-1] and len(ans) != 1:
+
+        #if all ways the same, the way will be chosen by priority
+        priority = [UP, LEFT, DOWN]
+        ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
+        print(ans)
+
+    obj.action = ans[0][0]
+
+
+def sprite_changes(obj, sprites):
+    obj.frame = (obj.frame + 0.3) % 2
+    obj.image = sprites[obj.action][int(obj.frame)]
+    obj.mask = pygame.mask.from_surface(obj.image)
+
+    obj.rect.x = (obj.rect.x + actions[obj.action][1]) % LEN_X
+    obj.rect.y = (obj.rect.y + actions[obj.action][0])

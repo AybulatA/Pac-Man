@@ -2,12 +2,11 @@ from global_names import *
 from tools import *
 import pygame
 
-
 sprites = load_and_resize_sprites('Pac-Man')
 
 
 class PacMan(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, first_gr, second_gr, border, map):
+    def __init__(self, pos_x, pos_y, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
         self.image = sprites['start_image'][0]
         self.frame = 0

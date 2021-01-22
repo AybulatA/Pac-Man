@@ -19,11 +19,19 @@ def draw_rect():
             pygame.draw.rect(screen, (125, 0, 0), (i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE), width=1)
 
 
+def update_fps():
+    fps = str(int(clock.get_fps()))
+    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    return fps_text
+
+
 if __name__ == '__main__':
     pygame.init()
     size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Pac-Man')
+
+    font = pygame.font.SysFont("Arial", 18)
 
     clock = pygame.time.Clock()
     running = True
@@ -34,9 +42,10 @@ if __name__ == '__main__':
         #screen.blit(fon, (0, 0))
         screen.fill(BLACK)
         events()
+        screen.blit(update_fps(), (10, 0))
         all_sprites.update()
         all_sprites.draw(screen)
         clock.tick(FPS)
-        draw_rect()
+        #draw_rect()
         pygame.display.flip()
     pygame.quit()

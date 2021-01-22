@@ -2,6 +2,7 @@ from Sprites import *
 from global_names import *
 from PacMan import PacMan
 from Blinky import Blinky
+from Pinky import Pinky
 
 
 def generate_level(level):
@@ -12,6 +13,7 @@ def generate_level(level):
             elif level[y][x] == '0':
                 Energizer(x, y, energizers_group, all_sprites)
     border = Border(borders_group, all_sprites)
-    player = PacMan(12, 23, player_group, all_sprites, border, level)
-    Blinky(14, 11, enemy_groups, all_sprites, player)
+    player = PacMan(12, 22, player_group, all_sprites)
+    Blinky(12, 8, enemy_groups, all_sprites, player)
+    Pinky(2, 2, enemy_groups, all_sprites, player)
     return player, border

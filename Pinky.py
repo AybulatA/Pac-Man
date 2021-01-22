@@ -1,10 +1,10 @@
 from global_names import *
 from tools import *
 
-sprites = load_and_resize_sprites('Blinky')
+sprites = load_and_resize_sprites('Pinky')
 
 
-class Blinky(pygame.sprite.Sprite):
+class Pinky(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, first_gr, second_gr, player):
         super().__init__(first_gr, second_gr)
         self.frame = 0
@@ -36,9 +36,16 @@ class Blinky(pygame.sprite.Sprite):
         sprite_changes(self, sprites)
 
     def choose_path(self, keys, pos):
-        target = ((self.player.rect.x + CELL_SIZE // 2) // CELL_SIZE,
-                  (self.player.rect.y + CELL_SIZE // 2) // CELL_SIZE)
+        target = [(self.player.rect.x + CELL_SIZE // 2) // CELL_SIZE,
+                  (self.player.rect.y + CELL_SIZE // 2) // CELL_SIZE]
+
+        act = self.player.action
+        if act in VERTICAL:
+            target[0] = (-1) ** VERTICAL.index(act) * 4 + target[0]
+            target[1] = target[1]
+        else:
+            target[0] = target[0]
+            target[1] = (-1) ** HORIZONTAL.index(act) * 4 + target[1]
 
         targeting(self, target, keys, pos)
-
 

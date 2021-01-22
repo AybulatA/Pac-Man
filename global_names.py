@@ -26,6 +26,12 @@ LEFT = pygame.K_LEFT
 DOWN = pygame.K_DOWN
 UP = pygame.K_UP
 
+for i in [RIGHT, LEFT, UP, DOWN]:
+    print(i)
+
+VERTICAL = [RIGHT, LEFT]
+HORIZONTAL = [DOWN, UP]
+
 actions = {
     RIGHT: (0, SPEED),
     LEFT: (0, -SPEED),
