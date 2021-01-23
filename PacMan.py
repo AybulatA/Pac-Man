@@ -8,8 +8,8 @@ sprites = load_and_resize_sprites('Pac-Man')
 class PacMan(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
-        self.image = sprites['start_image'][0]
         self.frame = 0
+        self.image = sprites['start_image'][self.frame]
         self.action = LEFT
         self.temporary_action = None
 
@@ -27,12 +27,7 @@ class PacMan(pygame.sprite.Sprite):
 
     def update(self):
         if self.action in possible_keys(self):
-            self.frame = (self.frame + 0.3) % 2
-            self.image = sprites[self.action][int(self.frame)]
-            self.mask = pygame.mask.from_surface(self.image)
-
-            self.rect.x = (self.rect.x + actions[self.action][1]) % LEN_X
-            self.rect.y = (self.rect.y + actions[self.action][0])
+            sprite_changes(self, sprites)
 
         #helps to turn at corners
         if self.temporary_action is not None:

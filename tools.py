@@ -84,17 +84,25 @@ def load_and_resize_sprites(name):
         UP: [load_image('up(first).png', colorkey=BLACK, key_path=name),
              load_image('up(second).png', colorkey=BLACK, key_path=name)],
         RIGHT: [load_image('right(first).png', colorkey=BLACK, key_path=name),
-                load_image('right(second).png', colorkey=BLACK, key_path=name)]
+                load_image('right(second).png', colorkey=BLACK, key_path=name)],
+        DOWN: [],
+        LEFT: []
     }
     if name == 'Pac-Man':
-        sprites[DOWN] = [pygame.transform.flip(sprites[UP][0], False, True),
-                         pygame.transform.flip(sprites[UP][1], False, True)]
-
-        sprites[LEFT] = [pygame.transform.flip(sprites[RIGHT][0], True, False),
-                         pygame.transform.flip(sprites[RIGHT][1], True, False)]
-
         sprites['start_image'] = [load_image('start.png',
                                              colorkey=BLACK, key_path=name)]
+
+        sprites[UP].extend(sprites['start_image'])
+        sprites[RIGHT].extend(sprites['start_image'])
+
+        sprites[UP].reverse()
+        sprites[RIGHT].reverse()
+
+        for sprite in sprites[UP]:
+            sprites[DOWN].append(pygame.transform.flip(sprite, False, True))
+
+        for sprite in sprites[RIGHT]:
+            sprites[LEFT].append(pygame.transform.flip(sprite, True, False))
     else:
         sprites[DOWN] = [load_image('down(first).png', colorkey=BLACK, key_path=name),
                          load_image('down(second).png', colorkey=BLACK, key_path=name)]
@@ -112,6 +120,7 @@ def load_and_resize_sprites(name):
 
 
 def targeting(obj, target, keys, pos):
+
     #ghosts on these cells cannot turn up
     if pos in [(12, 11), (15, 11), (15, 23), (12, 23)]:
         if UP in keys:
@@ -134,10 +143,9 @@ def targeting(obj, target, keys, pos):
 
     if ans[0][-1] == ans[-1][-1] and len(ans) != 1:
 
-        #if all ways the same, the way will be chosen by priority
+        #if all ways have the same length, the way will be chosen by priority
         priority = [UP, LEFT, DOWN]
         ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
-        print(ans)
 
     obj.action = ans[0][0]
 
@@ -149,3 +157,19 @@ def sprite_changes(obj, sprites):
 
     obj.rect.x = (obj.rect.x + actions[obj.action][1]) % LEN_X
     obj.rect.y = (obj.rect.y + actions[obj.action][0])
+
+
+def find_action(obj):
+    keys = possible_keys(obj)
+
+    #ghosts can't turn around
+    if opposite_keys[obj.action] in keys:
+        keys.remove(opposite_keys[obj.action])
+
+    pos = ((obj.rect.x + CELL_SIZE // 2) // CELL_SIZE,
+           (obj.rect.y + CELL_SIZE // 2) // CELL_SIZE)
+
+    if len(keys) > 1:
+        obj.choose_path(keys, pos)
+    else:
+        obj.action = keys[0]

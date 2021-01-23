@@ -37,5 +37,14 @@ class Energizer(pygame.sprite.Sprite):
             CELL_SIZE * pos_x, CELL_SIZE * pos_y)
 
     def update(self):
-        self.frame = (self.frame + 0.1) % 2
+        self.frame = (self.frame + 0.1) % len(self.sprites)
         self.image = self.sprites[int(self.frame)]
+
+
+class Target(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, first_gr):
+        super().__init__(first_gr)
+        self.image = pygame.transform.scale(load_image('cross.jpg'), (int(CELL_SIZE),
+                                                        int(CELL_SIZE)))
+        self.rect = self.image.get_rect().move(
+            CELL_SIZE * pos_x, CELL_SIZE * pos_y)

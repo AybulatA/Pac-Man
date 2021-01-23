@@ -19,19 +19,7 @@ class Blinky(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self):
-        keys = possible_keys(self)
-
-        #ghosts can't turn around
-        if opposite_keys[self.action] in keys:
-            keys.remove(opposite_keys[self.action])
-
-        pos = ((self.rect.x + CELL_SIZE // 2) // CELL_SIZE,
-               (self.rect.y + CELL_SIZE // 2) // CELL_SIZE)
-
-        if len(keys) > 1:
-            self.choose_path(keys, pos)
-        else:
-            self.action = keys[0]
+        find_action(self)
 
         sprite_changes(self, sprites)
 
