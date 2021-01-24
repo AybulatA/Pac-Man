@@ -9,8 +9,8 @@ class PacMan(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
         self.frame = 0
-        self.image = sprites['start_image'][self.frame]
         self.action = LEFT
+        self.image = sprites['start_image'][self.frame]
         self.temporary_action = None
 
         self.rect = self.image.get_rect().move(CELL_SIZE * pos_x - CELL_SIZE // 4,
@@ -27,7 +27,13 @@ class PacMan(pygame.sprite.Sprite):
 
     def update(self):
         if self.action in possible_keys(self):
-            sprite_changes(self, sprites)
+            path = sprites['alive'][self.action]
+            self.frame = (self.frame + 0.2) % len(path)
+            self.image = path[int(self.frame)]
+            self.mask = pygame.mask.from_surface(self.image)
+
+            self.rect.x = (self.rect.x + actions[self.action][1]) % LEN_X
+            self.rect.y = (self.rect.y + actions[self.action][0])
 
         #helps to turn at corners
         if self.temporary_action is not None:
@@ -44,5 +50,6 @@ class PacMan(pygame.sprite.Sprite):
             self.score += 10
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
             self.score += 50
+            game_parameters['mod'] = 'frightened'
 
 

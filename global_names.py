@@ -14,10 +14,13 @@ characters_obj = {
     'Pac-Man': None,
     'Blinky': None
 }
-mod = 'chase'
+
+game_parameters = {
+    'mod': 'chase'
+}
 
 #screen options
-WIDTH, HEIGHT = 1600, 1000
+WIDTH, HEIGHT = 1000, 1000
 FPS = 60
 
 SPEED = 3
@@ -50,7 +53,7 @@ opposite_keys = {
     LEFT: RIGHT
 }
 
-target_in_frightened_mod = {
+target_in_scatter_mod = {
     'Blinky': (25, 0),
     'Pinky': (2, 0),
     'Inky': (27, 31),

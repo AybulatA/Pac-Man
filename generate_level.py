@@ -19,4 +19,4 @@ def generate_level(level):
     characters_obj['Blinky'] = Blinky(21, 5, enemy_groups, all_sprites)
     Pinky(2, 22, enemy_groups, all_sprites)
     Inky(15, 2, enemy_groups, all_sprites)
-    Clyde(2, 22, enemy_groups, all_sprites)
+    Clyde(1, 22, enemy_groups, all_sprites)
