@@ -1,6 +1,7 @@
 import os
 import sys
 from global_names import *
+from random import choice
 
 
 def load_image(name, colorkey=None, key_path=None):
@@ -120,9 +121,8 @@ def load_and_resize_sprites(name):
 
 
 def targeting(obj, target, keys, pos):
-
     #ghosts on these cells cannot turn up
-    if pos in [(12, 11), (15, 11), (15, 23), (12, 23)]:
+    if pos in [[12, 11], [15, 11], [15, 23], [12, 23]]:
         if UP in keys:
             keys.remove(UP)
             obj.action = keys[0]
@@ -151,7 +151,7 @@ def targeting(obj, target, keys, pos):
 
 
 def sprite_changes(obj, sprites):
-    obj.frame = (obj.frame + 0.3) % 2
+    obj.frame = (obj.frame + 0.2) % 2
     obj.image = sprites[obj.action][int(obj.frame)]
     obj.mask = pygame.mask.from_surface(obj.image)
 
@@ -166,10 +166,17 @@ def find_action(obj):
     if opposite_keys[obj.action] in keys:
         keys.remove(opposite_keys[obj.action])
 
-    pos = ((obj.rect.x + CELL_SIZE // 2) // CELL_SIZE,
-           (obj.rect.y + CELL_SIZE // 2) // CELL_SIZE)
+    pos = [(obj.rect.x + CELL_SIZE // 2) // CELL_SIZE,
+           (obj.rect.y + CELL_SIZE // 2) // CELL_SIZE]
+
+    target = [(characters_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
+              (characters_obj['Pac-Man'].rect.y + CELL_SIZE // 2) // CELL_SIZE]
 
     if len(keys) > 1:
-        obj.choose_path(keys, pos)
+        obj.choose_path(keys, pos, target)
     else:
         obj.action = keys[0]
+
+
+def random(keys):
+    return choice(keys)

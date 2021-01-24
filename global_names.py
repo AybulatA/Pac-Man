@@ -9,6 +9,13 @@ energizers_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 enemy_groups = pygame.sprite.Group()
 
+
+characters_obj = {
+    'Pac-Man': None,
+    'Blinky': None
+}
+mod = 'chase'
+
 #screen options
 WIDTH, HEIGHT = 1600, 1000
 FPS = 60
@@ -41,6 +48,13 @@ opposite_keys = {
     UP: DOWN,
     DOWN: UP,
     LEFT: RIGHT
+}
+
+target_in_frightened_mod = {
+    'Blinky': (25, 0),
+    'Pinky': (2, 0),
+    'Inky': (27, 31),
+    'Clyde': (0, 31)
 }
 
 #colors

@@ -4,6 +4,7 @@ from PacMan import PacMan
 from Blinky import Blinky
 from Pinky import Pinky
 from Inky import Inky
+from Clyde import Clyde
 
 
 def generate_level(level):
@@ -13,9 +14,9 @@ def generate_level(level):
                 Food(x, y, foods_group, all_sprites)
             elif level[y][x] == '0':
                 Energizer(x, y, energizers_group, all_sprites)
-    border = Border(borders_group, all_sprites)
-    player = PacMan(12, 22, player_group, all_sprites)
-    blinky = Blinky(12, 8, enemy_groups, all_sprites, player)
-    Pinky(2, 2, enemy_groups, all_sprites, player)
-    Inky(4, 4, enemy_groups, all_sprites, player, blinky)
-    return player, border
+    Border(borders_group, all_sprites)
+    characters_obj['Pac-Man'] = PacMan(12, 22, player_group, all_sprites)
+    characters_obj['Blinky'] = Blinky(21, 5, enemy_groups, all_sprites)
+    Pinky(2, 22, enemy_groups, all_sprites)
+    Inky(15, 2, enemy_groups, all_sprites)
+    Clyde(2, 22, enemy_groups, all_sprites)

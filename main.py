@@ -10,7 +10,7 @@ def events():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYUP:
-            player.key_pressed(event.key)
+            characters_obj['Pac-Man'].key_pressed(event.key)
 
 
 def draw_rect():
@@ -36,16 +36,16 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     running = True
     #start_screen(screen)
-    player, border = generate_level(load_level('map.txt'))
+    generate_level(load_level('map.txt'))
     #fon = pygame.transform.scale(load_image('field.jpg'), (CELL_SIZE * 28, CELL_SIZE * 31))
     while running:
         #screen.blit(fon, (0, 0))
         screen.fill(BLACK)
         events()
-        screen.blit(update_fps(), (10, 0))
+        screen.blit(update_fps(), (CELL_SIZE * 29, 0))
         all_sprites.update()
         all_sprites.draw(screen)
         clock.tick(FPS)
-        draw_rect()
+        #draw_rect()
         pygame.display.flip()
     pygame.quit()

@@ -2,10 +2,10 @@ from global_names import *
 from tools import *
 from Sprites import Target
 
-sprites = load_and_resize_sprites('Pinky')
+sprites = load_and_resize_sprites('Clyde')
 
 
-class Pinky(pygame.sprite.Sprite):
+class Clyde(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
         self.frame = 0
@@ -28,18 +28,13 @@ class Pinky(pygame.sprite.Sprite):
         if mod == 'scatter':
             self.action = random(keys)
         else:
-            if mod == 'frightened':
-                target = target_in_frightened_mod['Pinky']
-            else:
-                act = characters_obj['Pac-Man'].action
-                if act in VERTICAL:
-                    target[0] = (-1) ** VERTICAL.index(act) * 4 + target[0]
-                else:
-                    target[0] += -4 if act == UP else 0   #this is bug in the original game
-                    target[1] = (-1) ** HORIZONTAL.index(act) * 4 + target[1]
+            if (abs(pos[0] - target[0]) ** 2 + abs(pos[1] - target[1]) ** 2) ** 0.5 < 8 or \
+                    mod == 'frightened':
+                target = target_in_frightened_mod['Clyde']
 
             self.target.rect.x = target[0] * CELL_SIZE
             self.target.rect.y = target[1] * CELL_SIZE
 
             targeting(self, target, keys, pos)
+
 
