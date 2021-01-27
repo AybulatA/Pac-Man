@@ -15,13 +15,18 @@ class Ghost(pygame.sprite.Sprite):
         self.image = self.sprites[game_parameters['mod']][self.action][self.frame]
         self.mask = pygame.mask.from_surface(self.image)
 
+        self.last_cell_action = None
+
         self.target = Target(0, 0, all_sprites)
 
         self.rect = self.image.get_rect().move(CELL_SIZE * pos_x - CELL_SIZE // 4,
                                                CELL_SIZE * pos_y - CELL_SIZE // 4)
 
+        self.real_rect_x = self.rect.x
+        self.real_rect_y = self.rect.y
+
     def update(self):
-        keys = find_action(self)
+        keys = self.find_action()
 
         if game_parameters['mod'] == 'frightened':
             self.action = random(keys)
@@ -33,9 +38,45 @@ class Ghost(pygame.sprite.Sprite):
             else:
                 target = self.choose_path()
 
-            targeting(self, target, keys)
+            self.targeting(target, keys)
 
-        sprite_changes(self, self.sprites)
+        self.sprite_changes()
+
+    def sprite_changes(self):
+        if game_parameters['mod'] == 'chase':
+            path = self.sprites[game_parameters['mod']][self.action]
+        else:
+            path = self.sprites[game_parameters['mod']]
+
+        actions = self.ghost_speed_change()
+        self.frame = (self.frame + 0.2) % len(path)
+        self.image = path[int(self.frame)]
+        self.mask = pygame.mask.from_surface(self.image)
+
+        self.real_rect_x = (self.real_rect_x + actions[self.action][1]) % LEN_X
+        self.real_rect_y = (self.real_rect_y + actions[self.action][0])
+
+        self.rect.x = int(self.real_rect_x)
+        self.rect.y = int(self.real_rect_y)
+
+    def ghost_speed_change(self):
+        if game_parameters['mod'] == 'frightened':
+            speed = MODS_SPEED['frightened']
+        elif position(self) in TUNNEL_CELLS:
+            speed = MODS_SPEED['tunnel']
+        elif game_parameters['mod'] == 'chase' or game_parameters['mod'] == 'scatter':
+            speed = self.default_speed()
+        else:
+            speed = 3
+        return {
+            RIGHT: (0, speed),
+            LEFT: (0, -speed),
+            DOWN: (speed, 0),
+            UP: (-speed, 0),
+        }
+
+    def default_speed(self):
+        return MODS_SPEED['chase']
 
     def choose_path(self):
 
@@ -49,6 +90,50 @@ class Ghost(pygame.sprite.Sprite):
 
         return target
 
-
     def new_target(self, target):
         return target
+
+    def find_action(self):
+        keys = possible_keys(self, self.ghost_speed_change())
+
+        if len(keys) == 1:
+            return keys
+
+        #ghosts can't turn around
+        if opposite_keys[self.action] in keys:
+            keys.remove(opposite_keys[self.action])
+
+        pos = position(self)
+        #ghosts on these cells cannot turn up
+        if pos in [[12, 11], [15, 11], [15, 23], [12, 23]]:
+            if UP in keys:
+                keys.remove(UP)
+
+        return keys
+
+    def targeting(self, target, keys):
+        pos = position(self)
+
+        ans = list()
+
+        for i in keys:
+            if i in VERTICAL:
+                x = (-1) ** VERTICAL.index(i) + pos[0]
+                y = pos[1]
+            else:
+                x = pos[0]
+                y = (-1) ** HORIZONTAL.index(i) + pos[1]
+            line = (abs(target[0] - x) ** 2 + abs(target[1] - y) ** 2) ** 0.5
+            ans.append((i, (x, y), line))
+
+        ans = sorted(ans, key=lambda z: z[-1])
+
+        if ans[0][-1] == ans[-1][-1] and len(ans) != 1:
+            #if all ways have the same length, the way will be chosen by priority
+            priority = [UP, LEFT, DOWN]
+            ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
+
+        self.action = ans[0][0]
+        self.last_cell_action = position(self)
+
+

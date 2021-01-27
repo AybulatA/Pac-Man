@@ -48,38 +48,6 @@ def start_screen(screen):
         pygame.display.flip()
 
 
-def possible_keys(obj):
-    ans = list()
-    coeff = CELL_SIZE // 8
-
-    pos_x = obj.rect.x + CELL_SIZE // 2
-    pos_y = obj.rect.y + CELL_SIZE // 2
-
-    acts = {
-        RIGHT: (pos_x + actions[RIGHT][0] + int(CELL_SIZE * 1.5) - coeff * 7,
-                pos_y + actions[RIGHT][1]),
-        LEFT: (pos_x + actions[LEFT][0] - coeff * 3,
-               pos_y + actions[LEFT][1]),
-        DOWN: (pos_x + actions[DOWN][0],
-               pos_y + actions[DOWN][1] + int(CELL_SIZE * 1.5) - coeff * 7),
-        UP: (pos_x + actions[UP][0],
-             pos_y + actions[UP][1] - coeff * 3)
-    }
-
-    for key, value in acts.items():
-        x_cell = (value[0] % LEN_X) // CELL_SIZE
-        y_cell = (value[1]) // CELL_SIZE
-        if MAP[y_cell][x_cell] in ['.', ' ', '0']:
-            if key in [UP, DOWN]:
-                if pos_x % CELL_SIZE not in [6, 8]:
-                    continue
-            else:
-                if pos_y % CELL_SIZE not in [6, 8]:
-                    continue
-            ans.append(key)
-    return ans
-
-
 def load_pacman_sprites(sprites):
     sprites_pac = {'alive': sprites['chase'].copy(),
                    'dead': [],
@@ -155,64 +123,42 @@ def resize(sprites):
     return sprites
 
 
-def targeting(obj, target, keys):
-    pos = position(obj)
-
-    ans = list()
-
-    for i in keys:
-        if i in VERTICAL:
-            x = (-1) ** VERTICAL.index(i) + pos[0]
-            y = pos[1]
-        else:
-            x = pos[0]
-            y = (-1) ** HORIZONTAL.index(i) + pos[1]
-        line = (abs(target[0] - x) ** 2 + abs(target[1] - y) ** 2) ** 0.5
-        ans.append((i, (x, y), line))
-
-    ans = sorted(ans, key=lambda z: z[-1])
-
-    if ans[0][-1] == ans[-1][-1] and len(ans) != 1:
-
-        #if all ways have the same length, the way will be chosen by priority
-        priority = [UP, LEFT, DOWN]
-        ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
-
-    obj.action = ans[0][0]
-
-
-def sprite_changes(obj, sprites):
-    if game_parameters['mod'] == 'chase':
-        path = sprites[game_parameters['mod']][obj.action]
-    else:
-        path = sprites[game_parameters['mod']]
-    obj.frame = (obj.frame + 0.2) % len(path)
-    obj.image = path[int(obj.frame)]
-    obj.mask = pygame.mask.from_surface(obj.image)
-
-    obj.rect.x = (obj.rect.x + actions[obj.action][1]) % LEN_X
-    obj.rect.y = (obj.rect.y + actions[obj.action][0])
-
-
-def find_action(obj):
-    keys = possible_keys(obj)
-
-    #ghosts can't turn around
-    if opposite_keys[obj.action] in keys:
-        keys.remove(opposite_keys[obj.action])
-
-    pos = position(obj)
-    #ghosts on these cells cannot turn up
-    if pos in [[12, 11], [15, 11], [15, 23], [12, 23]]:
-        if UP in keys:
-            keys.remove(UP)
-            obj.action = keys[0]
-
-    return keys
-
-
 def random(keys):
     return choice(keys)
+
+
+def possible_keys(obj, actions=actions):
+    ans = list()
+    coeff = CELL_SIZE // 8
+
+    pos_x = obj.rect.x + CELL_SIZE // 2
+    pos_y = obj.rect.y + CELL_SIZE // 2
+
+    acts = {
+        RIGHT: (int(pos_x + actions[RIGHT][0] + int(CELL_SIZE * 1.5) - coeff * 7),
+                int(pos_y + actions[RIGHT][1])),
+        LEFT: (int(pos_x + actions[LEFT][0] - coeff * 3),
+               int(pos_y + actions[LEFT][1])),
+        DOWN: (int(pos_x + actions[DOWN][0]),
+               int(pos_y + actions[DOWN][1] + int(CELL_SIZE * 1.5) - coeff * 7)),
+        UP: (int(pos_x + actions[UP][0]),
+             int(pos_y + actions[UP][1] - coeff * 3))
+    }
+
+    for key, value in acts.items():
+        x_cell = (value[0] % LEN_X) // CELL_SIZE
+        y_cell = (value[1]) // CELL_SIZE
+        if MAP[y_cell][x_cell] in ['.', ' ', '0']:
+            if key in [UP, DOWN]:
+                x = pos_x % CELL_SIZE
+                if x not in [6, 8]:
+                    continue
+            else:
+                y = pos_y % CELL_SIZE
+                if y not in [6, 8]:
+                    continue
+            ans.append(key)
+    return ans
 
 
 def position(obj):

@@ -23,7 +23,7 @@ game_parameters = {
 WIDTH, HEIGHT = 1000, 1000
 FPS = 60
 
-SPEED = 3
+SPEED = 2.5
 score = 0
 
 CELL_SIZE = 30
@@ -52,6 +52,16 @@ opposite_keys = {
     DOWN: UP,
     LEFT: RIGHT
 }
+
+MODS_SPEED = {
+    'frightened': SPEED * 0.6,
+    'chase': SPEED,
+    'scatter': SPEED,
+    'tunnel': SPEED * 0.4
+}
+
+TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
+                [23, 14], [24, 14], [27, 14], [26, 14], [25, 14]]
 
 target_in_scatter_mod = {
     'Blinky': (25, 0),

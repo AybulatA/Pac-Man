@@ -19,6 +19,9 @@ class PacMan(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.score = 0
 
+        self.real_rect_x = self.rect.x
+        self.real_rect_y = self.rect.y
+
     def key_pressed(self, key):
         if key in possible_keys(self):
             self.action = key
@@ -32,8 +35,11 @@ class PacMan(pygame.sprite.Sprite):
             self.image = path[int(self.frame)]
             self.mask = pygame.mask.from_surface(self.image)
 
-            self.rect.x = (self.rect.x + actions[self.action][1]) % LEN_X
-            self.rect.y = (self.rect.y + actions[self.action][0])
+            self.real_rect_x = (self.real_rect_x + actions[self.action][1]) % LEN_X
+            self.real_rect_y = (self.real_rect_y + actions[self.action][0])
+
+            self.rect.x = int(self.real_rect_x)
+            self.rect.y = int(self.real_rect_y)
 
         #helps to turn at corners
         if self.temporary_action is not None:
