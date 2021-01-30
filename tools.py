@@ -48,62 +48,29 @@ def start_screen(screen):
         pygame.display.flip()
 
 
-def load_pacman_sprites(sprites):
-    sprites_pac = {'alive': sprites['chase'].copy(),
-                   'dead': [],
-                   'start_image': [load_image('start.png', colorkey=BLACK, key_path='Pac-Man')]
-                   }
-
-    sprites_pac['alive'][UP].extend(sprites_pac['start_image'])
-    sprites_pac['alive'][RIGHT].extend(sprites_pac['start_image'])
-
-    sprites_pac['alive'][UP].reverse()
-    sprites_pac['alive'][RIGHT].reverse()
-
-    for sprite in sprites_pac['alive'][UP]:
-        sprites_pac['alive'][DOWN].append(pygame.transform.flip(sprite, False, True))
-
-    for sprite in sprites_pac['alive'][RIGHT]:
-        sprites_pac['alive'][LEFT].append(pygame.transform.flip(sprite, True, False))
-
-    for i in range(1, 12):
-        n = 'dead_' + str(i) + '.png'
-        sprites_pac['dead'].append(load_image(n, colorkey=BLACK, key_path='Pac-Man'))
-
-    return sprites_pac
-
-
-def load_and_resize_sprites(name):
-    sprites = {
-        'chase': {
-            UP: [load_image('up(first).png', colorkey=BLACK, key_path=name),
-                 load_image('up(second).png', colorkey=BLACK, key_path=name)],
-            RIGHT: [load_image('right(first).png', colorkey=BLACK, key_path=name),
-                    load_image('right(second).png', colorkey=BLACK, key_path=name)],
-            DOWN: [],
-            LEFT: []
-        },
-        'dead': []
-    }
-    if name == 'Pac-Man':
-        sprites = load_pacman_sprites(sprites)
-    else:
-        f = [load_image('frightened(first).png', colorkey=BLACK, key_path='Ghost'),
-             load_image('frightened(second).png', colorkey=BLACK, key_path='Ghost')]
-        sprites['frightened'] = f.copy()
-
-        f.append(load_image('half_frightened(first).png', colorkey=BLACK, key_path='Ghost'))
-        f.append(load_image('half_frightened(second).png', colorkey=BLACK, key_path='Ghost'))
-
-        sprites['half_frightened'] = f.copy()
-
-        sprites['chase'][DOWN] = [load_image('down(first).png', colorkey=BLACK, key_path=name),
-                                  load_image('down(second).png', colorkey=BLACK, key_path=name)]
-
-        sprites['chase'][LEFT] = [load_image('left(first).png', colorkey=BLACK, key_path=name),
-                                  load_image('left(second).png', colorkey=BLACK, key_path=name)]
-
-    return resize(sprites)
+# def load_and_resize_sprites(name):
+#     sprites = {
+#         'chase': {
+#             UP: [],
+#             RIGHT: [],
+#             DOWN: [],
+#             LEFT: []
+#         },
+#         'dead': []
+#     }
+#     sprites_pac = {'alive': sprites['chase'].copy(),
+#                    'dead': [],
+#                    'start_image': [load_image('start.png', colorkey=BLACK, key_path='Pac-Man')]
+#                    }
+#         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+#                                 sheet.get_height() // rows)
+#         for j in range(rows):
+#             for i in range(columns):
+#                 frame_location = (self.rect.w * i, self.rect.h * j)
+#                 self.frames.append(sheet.subsurface(pygame.Rect(
+#                     frame_location, self.rect.size)))
+#
+#     return resize(sprites)
 
 
 def resize(sprites):
