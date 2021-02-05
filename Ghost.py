@@ -8,14 +8,14 @@ class Ghost(pygame.sprite.Sprite):
         super().__init__(first_gr, second_gr)
 
         self.frame = 0
-        self.action = LEFT
+        self.action = UP
 
         self.name = name
         self.sprites = load_and_resize_sprites(self.name)
-        self.image = self.sprites[game_parameters['mod']][self.action][self.frame]
+        self.image = self.sprites[game_parameters['mod']][self.frame]
         self.mask = pygame.mask.from_surface(self.image)
 
-        self.last_cell_action = None
+        self.last_cell_action = [0, 0]
 
         self.target = Target(0, 0, all_sprites)
 
@@ -27,18 +27,21 @@ class Ghost(pygame.sprite.Sprite):
 
     def update(self):
         keys = self.find_action()
-
-        if game_parameters['mod'] == 'frightened':
-            self.action = random(keys)
-        elif len(keys) < 1:
+        if len(keys) == 1:
             self.action = keys[0]
         else:
-            if game_parameters['mod'] == 'scatter':
-                target = target_in_scatter_mod[self.name]
-            else:
-                target = self.choose_path()
+            if position(self) in ACTION_CELLS and self.last_cell_action != position(self):
+                if game_parameters['mod'] == 'frightened':
+                    self.action = random(keys)
+                else:
+                    if game_parameters['mod'] == 'scatter':
+                        target = target_in_scatter_mod[self.name]
+                    else:
+                        target = self.choose_path()
 
-            self.targeting(target, keys)
+                    self.targeting(target, keys)
+
+                self.last_cell_action = position(self)
 
         self.sprite_changes()
 
@@ -105,7 +108,7 @@ class Ghost(pygame.sprite.Sprite):
 
         pos = position(self)
         #ghosts on these cells cannot turn up
-        if pos in [[12, 11], [15, 11], [15, 23], [12, 23]]:
+        if pos in BLOCK_CELLS:
             if UP in keys:
                 keys.remove(UP)
 
@@ -134,6 +137,5 @@ class Ghost(pygame.sprite.Sprite):
             ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
 
         self.action = ans[0][0]
-        self.last_cell_action = position(self)
 
 
