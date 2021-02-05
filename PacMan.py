@@ -59,3 +59,4 @@ class PacMan(pygame.sprite.Sprite):
             game_parameters['mod'] = 'frightened'
 
 
+
