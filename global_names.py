@@ -16,11 +16,11 @@ characters_obj = {
 }
 
 game_parameters = {
-    'mod': 'chase'
+    'mod': 'frightened'
 }
 
 #screen options
-WIDTH, HEIGHT = 1000, 1000
+WIDTH, HEIGHT = 900, 900
 FPS = 60
 
 SPEED = 2.5
@@ -68,8 +68,21 @@ MODS_SPEED = {
     'tunnel': SPEED * 0.4
 }
 
+SPRITES_COORDS = {
+    'Pac-Man':
+        {
+            RIGHT: [[2, 0], [0, 0], [1, 0]],
+            LEFT: [[2, 0], [0, 1], [1, 1]],
+            UP: [[2, 0], [0, 2], [1, 2]],
+            DOWN: [[2, 0], [0, 3], [1, 3]],
+            'dead': []
+        }
+}
+
+
 TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
                 [23, 14], [24, 14], [27, 14], [26, 14], [25, 14]]
+
 
 BLOCK_CELLS = [[12, 11], [15, 11], [15, 23], [12, 23]]
 

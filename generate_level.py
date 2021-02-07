@@ -17,8 +17,10 @@ def generate_level(level):
             elif level[y][x] == '0':
                 Energizer(x, y, energizers_group, all_sprites)
 
+
     characters_obj['Pac-Man'] = PacMan(15, 8, player_group, all_sprites)
     characters_obj['Blinky'] = Blinky(10, 1, enemy_groups, all_sprites)
     Pinky(6, 22, enemy_groups, all_sprites)
     Inky(15, 5, enemy_groups, all_sprites)
     Clyde(1, 22, enemy_groups, all_sprites)
+

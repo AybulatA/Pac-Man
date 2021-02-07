@@ -23,11 +23,29 @@ def load_image(name, colorkey=None, key_path=None):
 
 def load_level(filename):
     global MAP
+    ans = list()
     filename = "data/" + filename
     with open(filename, encoding='utf-8') as mapFile:
-        MAP = [line for line in mapFile]
+        MAP = mapFile.read().split('\n')
+    print(MAP)
+    cells()
     return MAP
 
+
+def cells():
+    ans = list()
+    for i in range(len(MAP)):
+        for j in range(len(MAP[i])):
+            if MAP[i][j] in ['.', ' ', '0'] and i != 0 and j != 0:
+                n = 0
+                for z in range(-1, 2, 2):
+                    if MAP[i][j + z] in ['.', ' ', '0']:
+                        n += 1
+                    if MAP[i + z][j] in ['.', ' ', '0']:
+                        n += 1
+                if n > 2:
+                    ans.append([i, j])
+    print(ans)
 
 def terminate():
     pygame.quit()
