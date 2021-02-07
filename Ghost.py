@@ -8,12 +8,14 @@ class Ghost(pygame.sprite.Sprite):
         super().__init__(first_gr, second_gr)
 
         self.frame = 0
-        self.action = UP
+        self.action = LEFT
 
         self.name = name
         self.sprites = load_and_resize_sprites(self.name)
-        self.image = self.sprites[game_parameters['mod']][self.frame]
+        self.image = self.sprites[game_parameters['mod']][self.action][self.frame]
         self.mask = pygame.mask.from_surface(self.image)
+
+        self.last_cell_action = [0, 0]
 
         self.target = Target(0, 0, all_sprites)
 
@@ -104,6 +106,7 @@ class Ghost(pygame.sprite.Sprite):
         return MODS_SPEED['chase']
 
     def choose_path(self):
+
         target = [(characters_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
                   (characters_obj['Pac-Man'].rect.y + CELL_SIZE // 2) // CELL_SIZE]
 

@@ -46,7 +46,7 @@ if __name__ == '__main__':
         all_sprites.update()
         all_sprites.draw(screen)
         clock.tick(FPS)
-        draw_rect()
+        #draw_rect()
         pygame.display.flip()
         #game_parameters['mod'] = 'frightened'
     pygame.quit()
