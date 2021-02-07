@@ -28,6 +28,9 @@ score = 0
 
 CELL_SIZE = 30
 
+#sprite middle
+MIDDLE = CELL_SIZE * 1.5 / 2
+
 #field size, for tunnel
 LEN_X = CELL_SIZE * 27
 
@@ -35,6 +38,11 @@ RIGHT = pygame.K_RIGHT
 LEFT = pygame.K_LEFT
 DOWN = pygame.K_DOWN
 UP = pygame.K_UP
+
+print('up', UP)
+print('DOWN', DOWN)
+print('LEFT', LEFT)
+print('RIGHT', RIGHT)
 
 VERTICAL = [RIGHT, LEFT]
 HORIZONTAL = [DOWN, UP]
@@ -62,6 +70,8 @@ MODS_SPEED = {
 
 TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
                 [23, 14], [24, 14], [27, 14], [26, 14], [25, 14]]
+
+BLOCK_CELLS = [[12, 11], [15, 11], [15, 23], [12, 23]]
 
 target_in_scatter_mod = {
     'Blinky': (25, 0),

@@ -15,7 +15,7 @@ class Ghost(pygame.sprite.Sprite):
         self.image = self.sprites[game_parameters['mod']][self.action][self.frame]
         self.mask = pygame.mask.from_surface(self.image)
 
-        self.last_cell_action = None
+        self.last_cell_action = [0, 0]
 
         self.target = Target(0, 0, all_sprites)
 
@@ -27,18 +27,18 @@ class Ghost(pygame.sprite.Sprite):
 
     def update(self):
         keys = self.find_action()
-
-        if game_parameters['mod'] == 'frightened':
-            self.action = random(keys)
-        elif len(keys) < 1:
+        if len(keys) == 1:
             self.action = keys[0]
         else:
-            if game_parameters['mod'] == 'scatter':
-                target = target_in_scatter_mod[self.name]
+            if game_parameters['mod'] == 'frightened':
+                self.action = random(keys)
             else:
-                target = self.choose_path()
+                if game_parameters['mod'] == 'scatter':
+                    target = target_in_scatter_mod[self.name]
+                else:
+                    target = self.choose_path()
 
-            self.targeting(target, keys)
+                self.targeting(target, keys)
 
         self.sprite_changes()
 
@@ -53,8 +53,35 @@ class Ghost(pygame.sprite.Sprite):
         self.image = path[int(self.frame)]
         self.mask = pygame.mask.from_surface(self.image)
 
-        self.real_rect_x = (self.real_rect_x + actions[self.action][1]) % LEN_X
-        self.real_rect_y = (self.real_rect_y + actions[self.action][0])
+        center_x, center_y = cell_center(self)
+
+        move_x = actions[self.action][1]
+        move_y = actions[self.action][0]
+
+        #adjusts speed to get to the center of the cage
+        if self.action in VERTICAL:
+            if center_x < MIDDLE and center_x != MIDDLE:
+                if abs(center_x + move_x) > MIDDLE:
+                        move_x = MIDDLE - center_x
+                #if self.action == RIGHT:
+                #    if abs(center_x + move_x) > MIDDLE:
+                #        move_x = MIDDLE - center_x
+                #else:
+                #    if abs(center_x + move_x) > MIDDLE:
+                #        move_x = center_x - MIDDLE
+        else:
+            if center_y < MIDDLE and center_y != MIDDLE:
+                if abs(center_y + move_y) > MIDDLE:
+                        move_y = center_y - MIDDLE
+                #if self.action == DOWN:
+                #    if abs(center_y + move_y) > MIDDLE:
+                #        move_y = center_y - MIDDLE
+                #else:
+                #    if abs(center_y + move_y) > MIDDLE:
+                #        move_y = center_y - MIDDLE
+
+        self.real_rect_x = (self.real_rect_x + move_x) % LEN_X
+        self.real_rect_y = (self.real_rect_y + move_y)
 
         self.rect.x = int(self.real_rect_x)
         self.rect.y = int(self.real_rect_y)
@@ -94,7 +121,7 @@ class Ghost(pygame.sprite.Sprite):
         return target
 
     def find_action(self):
-        keys = possible_keys(self, self.ghost_speed_change())
+        keys = possible_keys(self)
 
         if len(keys) == 1:
             return keys
@@ -103,9 +130,8 @@ class Ghost(pygame.sprite.Sprite):
         if opposite_keys[self.action] in keys:
             keys.remove(opposite_keys[self.action])
 
-        pos = position(self)
         #ghosts on these cells cannot turn up
-        if pos in [[12, 11], [15, 11], [15, 23], [12, 23]]:
+        if position(self) in BLOCK_CELLS:
             if UP in keys:
                 keys.remove(UP)
 
@@ -134,6 +160,4 @@ class Ghost(pygame.sprite.Sprite):
             ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
 
         self.action = ans[0][0]
-        self.last_cell_action = position(self)
-
 
