@@ -17,8 +17,7 @@ def load_image(name, colorkey=None, key_path=None):
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
+    image = pygame.image.load(fullname)
     return image
 
 
@@ -51,7 +50,7 @@ def start_screen(screen):
 def load_pacman_sprites(sprites):
     sprites_pac = {'alive': sprites['chase'].copy(),
                    'dead': [],
-                   'start_image': [load_image('start.png', colorkey=BLACK, key_path='Pac-Man')]
+                   'start_image': [load_image('start.png', key_path='Pac-Man')]
                    }
 
     sprites_pac['alive'][UP].extend(sprites_pac['start_image'])
@@ -68,7 +67,10 @@ def load_pacman_sprites(sprites):
 
     for i in range(1, 12):
         n = 'dead_' + str(i) + '.png'
-        sprites_pac['dead'].append(load_image(n, colorkey=BLACK, key_path='Pac-Man'))
+        im = load_image(n, key_path='Pac-Man')
+        im = pygame.transform.scale(im, (int(CELL_SIZE * 1.5),
+                                         int(CELL_SIZE * 1.5)))
+        sprites_pac['dead'].append(im)
 
     return sprites_pac
 
@@ -76,10 +78,10 @@ def load_pacman_sprites(sprites):
 def load_and_resize_sprites(name):
     sprites = {
         'chase': {
-            UP: [load_image('up(first).png', colorkey=BLACK, key_path=name),
-                 load_image('up(second).png', colorkey=BLACK, key_path=name)],
-            RIGHT: [load_image('right(first).png', colorkey=BLACK, key_path=name),
-                    load_image('right(second).png', colorkey=BLACK, key_path=name)],
+            UP: [load_image('up(first).png', key_path=name),
+                 load_image('up(second).png', key_path=name)],
+            RIGHT: [load_image('right(first).png', key_path=name),
+                    load_image('right(second).png', key_path=name)],
             DOWN: [],
             LEFT: []
         },
@@ -88,37 +90,39 @@ def load_and_resize_sprites(name):
     if name == 'Pac-Man':
         sprites = load_pacman_sprites(sprites)
     else:
-        f = [load_image('frightened(first).png', colorkey=BLACK, key_path='Ghost'),
-             load_image('frightened(second).png', colorkey=BLACK, key_path='Ghost')]
+        f = [load_image('frightened(first).png', key_path='Ghost'),
+             load_image('frightened(second).png', key_path='Ghost')]
         sprites['frightened'] = f.copy()
 
-        f.append(load_image('half_frightened(first).png', colorkey=BLACK, key_path='Ghost'))
-        f.append(load_image('half_frightened(second).png', colorkey=BLACK, key_path='Ghost'))
+        f.append(load_image('half_frightened(first).png', key_path='Ghost'))
+        f.append(load_image('half_frightened(second).png', key_path='Ghost'))
 
         sprites['half_frightened'] = f.copy()
 
-        sprites['chase'][DOWN] = [load_image('down(first).png', colorkey=BLACK, key_path=name),
-                                  load_image('down(second).png', colorkey=BLACK, key_path=name)]
+        sprites['chase'][DOWN] = [load_image('down(first).png', key_path=name),
+                                  load_image('down(second).png', key_path=name)]
 
-        sprites['chase'][LEFT] = [load_image('left(first).png', colorkey=BLACK, key_path=name),
-                                  load_image('left(second).png', colorkey=BLACK, key_path=name)]
+        sprites['chase'][LEFT] = [load_image('left(first).png', key_path=name),
+                                  load_image('left(second).png', key_path=name)]
 
     return resize(sprites)
 
 
 def resize(sprites):
-    for z in sprites:
-        if z == 'chase' or z == 'alive':
-            for i in sprites[z]:
-                for j in range(len(sprites[z][i])):
-                    el = sprites[z][i][j]
-                    sprites[z][i][j] = pygame.transform.scale(el, (int(CELL_SIZE * 1.5),
-                                                                   int(CELL_SIZE * 1.5)))
+    for i in sprites:
+        if i not in ['start_image', 'dead', 'frightened', 'half_frightened']:
+            for j in sprites[i]:
+                for z in range(len(sprites[i][j])):
+                    sprites[i][j][z] = pygame.transform.scale(sprites[i][j][z],
+                                                              (int(CELL_SIZE * 1.5),
+                                                               int(CELL_SIZE * 1.5)))
+                    sprites[i][j][z].set_colorkey(BLACK)
         else:
-            for i in range(len(sprites[z])):
-                el = sprites[z][i]
-                sprites[z][i] = pygame.transform.scale(el, (int(CELL_SIZE * 1.5),
-                                                            int(CELL_SIZE * 1.5)))
+            for j in range(len(sprites[i])):
+                sprites[i][j] = pygame.transform.scale(sprites[i][j],
+                                                       (int(CELL_SIZE * 1.5),
+                                                        int(CELL_SIZE * 1.5)))
+                sprites[i][j].set_colorkey(BLACK)
 
     return sprites
 
@@ -127,40 +131,36 @@ def random(keys):
     return choice(keys)
 
 
-def possible_keys(obj, actions=actions):
+def possible_keys(obj):
     ans = list()
-    coeff = CELL_SIZE // 8
 
-    pos_x = obj.rect.x + CELL_SIZE // 2
-    pos_y = obj.rect.y + CELL_SIZE // 2
+    pos_x, pos_y = position(obj)
+
+    x_t, y_t = cell_center(obj)
+
+    if x_t != MIDDLE or y_t != MIDDLE:
+        return [obj.action]
 
     acts = {
-        RIGHT: (int(pos_x + actions[RIGHT][0] + int(CELL_SIZE * 1.5) - coeff * 7),
-                int(pos_y + actions[RIGHT][1])),
-        LEFT: (int(pos_x + actions[LEFT][0] - coeff * 3),
-               int(pos_y + actions[LEFT][1])),
-        DOWN: (int(pos_x + actions[DOWN][0]),
-               int(pos_y + actions[DOWN][1] + int(CELL_SIZE * 1.5) - coeff * 7)),
-        UP: (int(pos_x + actions[UP][0]),
-             int(pos_y + actions[UP][1] - coeff * 3))
+        RIGHT: (pos_x + 1, pos_y),
+        LEFT: (pos_x - 1, pos_y),
+        DOWN: (pos_x, pos_y + 1),
+        UP: (pos_x, pos_y - 1)
     }
 
     for key, value in acts.items():
-        x_cell = (value[0] % LEN_X) // CELL_SIZE
-        y_cell = (value[1]) // CELL_SIZE
+        x_cell = value[0] % LEN_X
+        y_cell = value[1]
         if MAP[y_cell][x_cell] in ['.', ' ', '0']:
-            if key in [UP, DOWN]:
-                x = pos_x % CELL_SIZE
-                if x not in [6, 8]:
-                    continue
-            else:
-                y = pos_y % CELL_SIZE
-                if y not in [6, 8]:
-                    continue
             ans.append(key)
     return ans
 
 
 def position(obj):
-    return [(obj.rect.x + CELL_SIZE // 2) // CELL_SIZE,
-            (obj.rect.y + CELL_SIZE // 2) // CELL_SIZE]
+    return [int((obj.rect.x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) / CELL_SIZE),
+            int((obj.rect.y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) / CELL_SIZE)]
+
+
+def cell_center(obj):
+    return ((obj.rect.x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE,
+            (obj.rect.y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE)
