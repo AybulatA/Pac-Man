@@ -10,7 +10,7 @@ def events():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYUP:
-            characters_obj['Pac-Man'].key_pressed(event.key)
+            game_obj['Pac-Man'].key_pressed(event.key)
 
 
 def draw_rect():
@@ -25,6 +25,12 @@ def update_fps():
     return fps_text
 
 
+def check_game_status():
+    if game_parameters['mod'] == 'game over':
+        game_parameters['mod'] = 'chase'
+        generate_level(game_parameters['map'])
+
+
 if __name__ == '__main__':
     pygame.init()
     size = WIDTH, HEIGHT
@@ -36,9 +42,11 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     running = True
     #start_screen(screen)
-    generate_level(load_level('map.txt'))
+    game_parameters['map'] = load_level('map.txt')
+    generate_level(game_parameters['map'])
     #fon = pygame.transform.scale(load_image('field.jpg'), (CELL_SIZE * 28, CELL_SIZE * 31))
     while running:
+        check_game_status()
         #screen.blit(fon, (0, 0))
         screen.fill(BLACK)
         events()

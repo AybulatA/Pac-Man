@@ -7,24 +7,26 @@ borders_group = pygame.sprite.Group()
 foods_group = pygame.sprite.Group()
 energizers_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
-enemy_groups = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
 
 
-characters_obj = {
+game_obj = {
     'Pac-Man': None,
     'Blinky': None
 }
 
 game_parameters = {
-    'mod': 'chase'
+    'mod': 'chase',
+    'map': None
 }
 
 #screen options
 WIDTH, HEIGHT = 1000, 1000
 FPS = 60
 
-SPEED = 5
+SPEED = 2.5
 score = 0
+DEAD_GHOST_SPEED = 8
 
 CELL_SIZE = 30
 
@@ -72,6 +74,8 @@ TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
                 [23, 14], [24, 14], [27, 14], [26, 14], [25, 14]]
 
 BLOCK_CELLS = [[12, 11], [15, 11], [15, 23], [12, 23]]
+
+HOME_POS = [14, 15]
 
 target_in_scatter_mod = {
     'Blinky': (25, 0),

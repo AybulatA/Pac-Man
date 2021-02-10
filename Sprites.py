@@ -41,6 +41,11 @@ class Energizer(pygame.sprite.Sprite):
         self.image = self.sprites[int(self.frame)]
 
 
+#class Score(pygame.sprite.Sprite):
+#    def __init__(self, gr):
+#        super().__init__(gr)
+
+
 class Target(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, first_gr):
         super().__init__(first_gr)

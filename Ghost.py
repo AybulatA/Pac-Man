@@ -9,6 +9,7 @@ class Ghost(pygame.sprite.Sprite):
 
         self.frame = 0
         self.action = LEFT
+        self.alive = True
 
         self.name = name
         self.sprites = load_and_resize_sprites(self.name)
@@ -30,23 +31,39 @@ class Ghost(pygame.sprite.Sprite):
         if len(keys) == 1:
             self.action = keys[0]
         else:
-            if game_parameters['mod'] == 'frightened':
+            if game_parameters['mod'] == 'frightened' and self.alive:
                 self.action = random(keys)
             else:
-                if game_parameters['mod'] == 'scatter':
+                if position(self) == HOME_POS and self.alive is False:
+                    self.alive = True
+                    self.kill()
+                    return None
+                if self.alive is False:
+                    target = HOME_POS
+                elif game_parameters['mod'] == 'scatter':
                     target = target_in_scatter_mod[self.name]
                 else:
                     target = self.choose_path()
 
                 self.targeting(target, keys)
 
-        self.sprite_changes()
+        if game_parameters['mod'] != 'stop':
+            self.sprite_changes()
+
+    def dead(self):
+        self.alive = False
+        self.frame = 0
 
     def sprite_changes(self):
-        if game_parameters['mod'] == 'chase':
-            path = self.sprites[game_parameters['mod']][self.action]
+        if self.alive is True:
+            mod = game_parameters['mod']
         else:
-            path = self.sprites[game_parameters['mod']]
+            mod = 'dead'
+
+        if game_parameters['mod'] != 'frightened' or self.alive is False:
+            path = self.sprites[mod][self.action]
+        else:
+            path = self.sprites[mod]
 
         actions = self.ghost_speed_change()
         self.frame = (self.frame + 0.2) % len(path)
@@ -58,27 +75,26 @@ class Ghost(pygame.sprite.Sprite):
         move_x = actions[self.action][1]
         move_y = actions[self.action][0]
 
+        next_x = center_x + move_x
+        next_y = center_y + move_y
+
         #adjusts speed to get to the center of the cage
         if self.action in VERTICAL:
-            if center_x < MIDDLE and center_x != MIDDLE:
-                if abs(center_x + move_x) > MIDDLE:
+            if center_x > MIDDLE and center_x != MIDDLE:
+                if self.action == RIGHT:
+                    if next_x > MIDDLE:
                         move_x = MIDDLE - center_x
-                #if self.action == RIGHT:
-                #    if abs(center_x + move_x) > MIDDLE:
-                #        move_x = MIDDLE - center_x
-                #else:
-                #    if abs(center_x + move_x) > MIDDLE:
-                #        move_x = center_x - MIDDLE
+                else:
+                    if next_x > MIDDLE:
+                        move_x = center_x - MIDDLE
         else:
-            if center_y < MIDDLE and center_y != MIDDLE:
-                if abs(center_y + move_y) > MIDDLE:
-                        move_y = center_y - MIDDLE
-                #if self.action == DOWN:
-                #    if abs(center_y + move_y) > MIDDLE:
-                #        move_y = center_y - MIDDLE
-                #else:
-                #    if abs(center_y + move_y) > MIDDLE:
-                #        move_y = center_y - MIDDLE
+            if center_y > MIDDLE and center_y != MIDDLE:
+                if self.action == DOWN:
+                    if next_y > MIDDLE:
+                        move_y = MIDDLE - center_y
+                else:
+                    if next_y < MIDDLE:
+                        move_y = MIDDLE - center_y
 
         self.real_rect_x = (self.real_rect_x + move_x) % LEN_X
         self.real_rect_y = (self.real_rect_y + move_y)
@@ -87,7 +103,9 @@ class Ghost(pygame.sprite.Sprite):
         self.rect.y = int(self.real_rect_y)
 
     def ghost_speed_change(self):
-        if game_parameters['mod'] == 'frightened':
+        if self.alive is False:
+            speed = DEAD_GHOST_SPEED
+        elif game_parameters['mod'] == 'frightened':
             speed = MODS_SPEED['frightened']
         elif position(self) in TUNNEL_CELLS:
             speed = MODS_SPEED['tunnel']
@@ -107,8 +125,8 @@ class Ghost(pygame.sprite.Sprite):
 
     def choose_path(self):
 
-        target = [(characters_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
-                  (characters_obj['Pac-Man'].rect.y + CELL_SIZE // 2) // CELL_SIZE]
+        target = [(game_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
+                  (game_obj['Pac-Man'].rect.y + CELL_SIZE // 2) // CELL_SIZE]
 
         target = self.new_target(target)
 
@@ -121,7 +139,11 @@ class Ghost(pygame.sprite.Sprite):
         return target
 
     def find_action(self):
-        keys = possible_keys(self)
+        if self.alive:
+            point = None
+        else:
+            point = '_'
+        keys = possible_keys(self, point)
 
         if len(keys) == 1:
             return keys

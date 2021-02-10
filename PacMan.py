@@ -12,12 +12,12 @@ class PacMan(pygame.sprite.Sprite):
         self.action = LEFT
         self.image = sprites['start_image'][self.frame]
         self.temporary_action = None
+        self.alive = True
 
         self.rect = self.image.get_rect().move(CELL_SIZE * pos_x - CELL_SIZE // 4,
                                                CELL_SIZE * pos_y - CELL_SIZE // 4)
 
         self.mask = pygame.mask.from_surface(self.image)
-        self.score = 0
 
         self.real_rect_x = self.rect.x
         self.real_rect_y = self.rect.y
@@ -28,18 +28,52 @@ class PacMan(pygame.sprite.Sprite):
         else:
             self.temporary_action = ((self.rect.x, self.rect.y), key)
 
+    def dead(self):
+        self.alive = False
+        for i in enemy_group:
+            i.kill()
+        self.action = None
+
     def update(self):
-        if self.action in possible_keys(self):
-            path = sprites['alive'][self.action]
-            self.frame = (self.frame + 0.2) % len(path)
+        enemy = pygame.sprite.spritecollide(self, enemy_group, False)
+        if len(enemy) != 0:
+            enemy = enemy[0]
+            if position(self) == position(enemy):
+                if game_parameters['mod'] == 'frightened':
+                    enemy.dead()
+                else:
+                    self.dead()
+                    self.frame = 0
+
+        if self.alive is False:
+            frame_speed = 0.05
+        else:
+            frame_speed = 0.2
+
+        if (self.action in possible_keys(self) or self.alive is False)\
+                and game_parameters['mod'] != 'stop':
+            if self.alive is True:
+                path = sprites['alive'][self.action]
+            else:
+                path = sprites['dead']
+            self.frame = self.frame + frame_speed
+
+            if self.frame >= len(sprites['dead']) and self.alive is False:
+                kill_all_sprites()
+                return None
+
+            if self.alive:
+                self.frame = self.frame % len(path)
+
             self.image = path[int(self.frame)]
             self.mask = pygame.mask.from_surface(self.image)
 
-            self.real_rect_x = (self.real_rect_x + actions[self.action][1]) % LEN_X
-            self.real_rect_y = (self.real_rect_y + actions[self.action][0])
+            if self.alive is True:
+                self.real_rect_x = (self.real_rect_x + actions[self.action][1]) % LEN_X
+                self.real_rect_y = (self.real_rect_y + actions[self.action][0])
 
-            self.rect.x = int(self.real_rect_x)
-            self.rect.y = int(self.real_rect_y)
+                self.rect.x = int(self.real_rect_x)
+                self.rect.y = int(self.real_rect_y)
 
         #helps to turn at corners
         if self.temporary_action is not None:
@@ -53,9 +87,9 @@ class PacMan(pygame.sprite.Sprite):
                 self.temporary_action = None
 
         if len(pygame.sprite.spritecollide(self, foods_group, True)) == 1:
-            self.score += 10
+            pass
+            #game_obj['score'] += 10
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
-            self.score += 50
             game_parameters['mod'] = 'frightened'
 
 

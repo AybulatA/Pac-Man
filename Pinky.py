@@ -7,7 +7,7 @@ class Pinky(Ghost):
         super().__init__(pos_x, pos_y, first_gr, second_gr, 'Pinky')
 
     def new_target(self, target):
-        act = characters_obj['Pac-Man'].action
+        act = game_obj['Pac-Man'].action
         if act in VERTICAL:
             target[0] = (-1) ** VERTICAL.index(act) * 4 + target[0]
         else:

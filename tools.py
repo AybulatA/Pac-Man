@@ -22,11 +22,10 @@ def load_image(name, colorkey=None, key_path=None):
 
 
 def load_level(filename):
-    global MAP
     filename = "data/" + filename
     with open(filename, encoding='utf-8') as mapFile:
-        MAP = [line for line in mapFile]
-    return MAP
+        map = [line for line in mapFile]
+    return map
 
 
 def terminate():
@@ -105,19 +104,26 @@ def load_and_resize_sprites(name):
         sprites['chase'][LEFT] = [load_image('left(first).png', key_path=name),
                                   load_image('left(second).png', key_path=name)]
 
+        sprites['dead'] = {
+            UP: [load_image('dead(up).png', key_path='Ghost')],
+            DOWN: [load_image('dead(down).png', key_path='Ghost')],
+            RIGHT: [load_image('dead(right).png', key_path='Ghost')],
+            LEFT: [load_image('dead(left).png', key_path='Ghost')]
+        }
+
     return resize(sprites)
 
 
 def resize(sprites):
     for i in sprites:
-        if i not in ['start_image', 'dead', 'frightened', 'half_frightened']:
+        try:
             for j in sprites[i]:
                 for z in range(len(sprites[i][j])):
                     sprites[i][j][z] = pygame.transform.scale(sprites[i][j][z],
                                                               (int(CELL_SIZE * 1.5),
                                                                int(CELL_SIZE * 1.5)))
                     sprites[i][j][z].set_colorkey(BLACK)
-        else:
+        except Exception:
             for j in range(len(sprites[i])):
                 sprites[i][j] = pygame.transform.scale(sprites[i][j],
                                                        (int(CELL_SIZE * 1.5),
@@ -131,7 +137,7 @@ def random(keys):
     return choice(keys)
 
 
-def possible_keys(obj):
+def possible_keys(obj, point=None):
     ans = list()
 
     pos_x, pos_y = position(obj)
@@ -148,10 +154,14 @@ def possible_keys(obj):
         UP: (pos_x, pos_y - 1)
     }
 
+    points = ['.', ' ', '0']
+    if point is not None:
+        points.append(point)
+
     for key, value in acts.items():
         x_cell = value[0] % LEN_X
         y_cell = value[1]
-        if MAP[y_cell][x_cell] in ['.', ' ', '0']:
+        if game_parameters['map'][y_cell][x_cell] in points:
             ans.append(key)
     return ans
 
@@ -162,5 +172,11 @@ def position(obj):
 
 
 def cell_center(obj):
-    return ((obj.rect.x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE,
-            (obj.rect.y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE)
+    return ((obj.real_rect_x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE,
+            (obj.real_rect_y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE)
+
+
+def kill_all_sprites():
+    for i in all_sprites:
+        i.kill()
+    game_parameters['mod'] = 'game over'
