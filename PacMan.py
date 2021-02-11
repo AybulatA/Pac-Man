@@ -35,6 +35,7 @@ class PacMan(pygame.sprite.Sprite):
         self.action = None
 
     def update(self):
+        score = 0
         mod = game_parameters['mod']
         enemy = pygame.sprite.spritecollide(self, enemy_group, False)
         if len(enemy) != 0:
@@ -44,6 +45,7 @@ class PacMan(pygame.sprite.Sprite):
                     game_parameters['ate ghosts'] += 1
                     game_parameters['mod'] = 'stop'
                     enemy.dead()
+                    score += (2 ** game_parameters['ate ghosts']) * 200
                 else:
                     self.dead()
                     self.frame = 0
@@ -89,10 +91,11 @@ class PacMan(pygame.sprite.Sprite):
                 self.temporary_action = None
 
         if len(pygame.sprite.spritecollide(self, foods_group, True)) == 1:
-            pass
-            #game_obj['score'] += 10
+            score += 10
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
             game_parameters['saved mod'] = game_parameters['mod']
             game_parameters['mod'] = 'frightened'
+            score += 50
             stop_timer()
             change_way()
+        game_parameters['score'] += score

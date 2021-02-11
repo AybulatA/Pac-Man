@@ -23,6 +23,7 @@ def events():
             game_parameters['mod'] = 'half_frightened'
         elif event.type == HALF_FRIGHTENED_EVENT_ID:
             game_parameters['mod'] = game_parameters['saved mod']
+            game_parameters['ate ghosts'] = -1
             timer(pygame.time.get_ticks() - game_parameters['stopped timer'])
 
 
@@ -59,16 +60,31 @@ def timer(time=None):
             pass
 
 
+def draw_score():
+    return font.render(str(game_parameters['score']), 1, pygame.Color("white"))
+
+
+def check_game_score():
+    if len(energizers_group) == len(foods_group) == 0:
+        game_parameters['level'] += 1
+        game_parameters['mod'] = 'game over'
+
+
 def check_game_status():
-    if game_parameters['mod'] == 'game over':
+    mod = game_parameters['mod']
+    if mod == 'game over' or mod == 'attempt':
         pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
         game_parameters['mod'] = 'scatter'
         game_parameters['timer_num'] = 0
-        generate_level(game_parameters['map'])
+        generate_level(game_parameters['map'], new_game=True if mod == 'game over' else False)
         timer()
     elif game_parameters['mod'] == 'stop':
         pygame.time.wait(1000)
         game_parameters['mod'] = 'frightened'
+
+
+def score_update():
+    return font_score.render(str(game_parameters['score']), 1, pygame.Color("white"))
 
 
 if __name__ == '__main__':
@@ -78,6 +94,7 @@ if __name__ == '__main__':
     pygame.display.set_caption('Pac-Man')
 
     font = pygame.font.SysFont("Arial", 18)
+    font_score = pygame.font.SysFont("PerfectDOSVGA437", 36)
 
     timer()
     clock = pygame.time.Clock()
@@ -85,13 +102,16 @@ if __name__ == '__main__':
     #start_screen(screen)
     game_parameters['map'] = load_level('map.txt')
     generate_level(game_parameters['map'])
+    print(len(foods_group))
     #fon = pygame.transform.scale(load_image('field.jpg'), (CELL_SIZE * 28, CELL_SIZE * 31))
     while running:
+        check_game_score()
         check_game_status()
         #screen.blit(fon, (0, 0))
         screen.fill(BLACK)
         events()
         screen.blit(update_fps(), (CELL_SIZE * 29, 0))
+        screen.blit(score_update(), (CELL_SIZE * 29, CELL_SIZE * 3))
         all_sprites.update()
         all_sprites.draw(screen)
         clock.tick(FPS)

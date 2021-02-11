@@ -41,15 +41,21 @@ class Energizer(pygame.sprite.Sprite):
         self.image = self.sprites[int(self.frame)]
 
 
-#class Score(pygame.sprite.Sprite):
-#    def __init__(self, gr):
-#        super().__init__(gr)
-
-
 class Target(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, first_gr):
-        super().__init__(first_gr)
+    def __init__(self, pos_x, pos_y, gr):
+        super().__init__(gr)
         self.image = pygame.transform.scale(load_image('cross.jpg'), (int(CELL_SIZE),
-                                                        int(CELL_SIZE)))
+                                                                      int(CELL_SIZE)))
         self.rect = self.image.get_rect().move(
             CELL_SIZE * pos_x, CELL_SIZE * pos_y)
+
+
+class Attempts(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, fr_gr, sec_gr):
+        super().__init__(fr_gr, sec_gr)
+        im = load_image('right(first).png', key_path='Pac-Man')
+        im = pygame.transform.flip(im, True, False)
+        self.image = pygame.transform.scale(im, (int(CELL_SIZE),
+                                                 int(CELL_SIZE)))
+        self.rect = self.image.get_rect().move(
+            CELL_SIZE // 4 + CELL_SIZE * pos_x, CELL_SIZE // 4 + CELL_SIZE * pos_y)

@@ -185,9 +185,21 @@ def cell_center(obj):
 
 
 def kill_all_sprites():
+    n = len(attempts_group)
     for i in all_sprites:
-        i.kill()
-    game_parameters['mod'] = 'game over'
+        if i in player_group or i in enemy_group or n == 0:
+            i.kill()
+    if n != 0:
+        for i in attempts_group:
+            if n == 1:
+                i.kill()
+            n -= 1
+        game_parameters['mod'] = 'attempt'
+    else:
+        game_parameters['score'] = 0
+        game_parameters['level'] = 1
+
+        game_parameters['mod'] = 'game over'
 
 
 def change_way():

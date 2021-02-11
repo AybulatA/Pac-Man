@@ -8,6 +8,7 @@ foods_group = pygame.sprite.Group()
 energizers_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
+attempts_group = pygame.sprite.Group()
 
 
 game_obj = {
@@ -22,7 +23,8 @@ game_parameters = {
     'ate ghosts': -1,
     'stopped timer': 0,
     'saved mod': None,
-    'map': None
+    'map': None,
+    'score': 0
 }
 
 #screen options
@@ -30,7 +32,6 @@ WIDTH, HEIGHT = 1000, 1000
 FPS = 60
 
 SPEED = 2.5
-score = 0
 
 DEFAULT_EVENT_ID = pygame.USEREVENT + 1
 FRIGHTENED_EVENT_ID = pygame.USEREVENT + 2
