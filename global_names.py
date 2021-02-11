@@ -16,7 +16,12 @@ game_obj = {
 }
 
 game_parameters = {
-    'mod': 'chase',
+    'mod': 'scatter',
+    'level': 1,
+    'timer_num': 0,
+    'ate ghosts': -1,
+    'stopped timer': 0,
+    'saved mod': None,
     'map': None
 }
 
@@ -26,7 +31,10 @@ FPS = 60
 
 SPEED = 2.5
 score = 0
-DEAD_GHOST_SPEED = 8
+
+DEFAULT_EVENT_ID = pygame.USEREVENT + 1
+FRIGHTENED_EVENT_ID = pygame.USEREVENT + 2
+HALF_FRIGHTENED_EVENT_ID = pygame.USEREVENT + 3
 
 CELL_SIZE = 30
 
@@ -67,7 +75,8 @@ MODS_SPEED = {
     'frightened': SPEED * 0.6,
     'chase': SPEED,
     'scatter': SPEED,
-    'tunnel': SPEED * 0.4
+    'tunnel': SPEED * 0.4,
+    'dead': SPEED * 3
 }
 
 TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
@@ -75,13 +84,19 @@ TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
 
 BLOCK_CELLS = [[12, 11], [15, 11], [15, 23], [12, 23]]
 
-HOME_POS = [14, 15]
+HOME_POS = [13, 15]
 
 target_in_scatter_mod = {
     'Blinky': (25, 0),
     'Pinky': (2, 0),
     'Inky': (27, 31),
     'Clyde': (0, 31)
+}
+
+LEVEL_TIME_CHANGE = {
+    '1': [7, 20, 7, 20, 5, 20, 5],
+    '2 3 4 5': [7, 20, 7, 20, 5, 1033, 1 / 60],
+    'infinity': [5, 20, 5, 20, 5, 1037, 1 / 60]
 }
 
 #colors

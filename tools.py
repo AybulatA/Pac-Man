@@ -2,6 +2,7 @@ import os
 import sys
 from global_names import *
 from random import choice
+import pygame
 
 
 def load_image(name, colorkey=None, key_path=None):
@@ -104,6 +105,13 @@ def load_and_resize_sprites(name):
         sprites['chase'][LEFT] = [load_image('left(first).png', key_path=name),
                                   load_image('left(second).png', key_path=name)]
 
+        sprites['scatter'] = sprites['chase'].copy()
+
+        sprites['points'] = []
+        p = ['200', '400', '800', '1600']
+        for i in p:
+            sprites['points'].append(load_image(i + '.png', key_path='Ghost'))
+
         sprites['dead'] = {
             UP: [load_image('dead(up).png', key_path='Ghost')],
             DOWN: [load_image('dead(down).png', key_path='Ghost')],
@@ -180,3 +188,16 @@ def kill_all_sprites():
     for i in all_sprites:
         i.kill()
     game_parameters['mod'] = 'game over'
+
+
+def change_way():
+    for i in enemy_group:
+        i.action = opposite_keys[i.action]
+
+
+#in frightened mod timer stops
+def stop_timer():
+    game_parameters['stopped timer'] = pygame.time.get_ticks()
+    time = 6000 / 19 * (19 - game_parameters['level'])
+    pygame.time.set_timer(FRIGHTENED_EVENT_ID, int(time), True)
+    pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, int(time) + 2000, True)

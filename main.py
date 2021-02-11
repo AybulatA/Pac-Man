@@ -11,6 +11,27 @@ def events():
             running = False
         elif event.type == pygame.KEYUP:
             game_obj['Pac-Man'].key_pressed(event.key)
+        elif event.type == DEFAULT_EVENT_ID:
+            if game_parameters['mod'] != 'frightened':
+                ans = ['Mod changed from', game_parameters['mod'], 'to']
+                change_mod()
+                ans.append(game_parameters['mod'])
+                print(game_parameters['timer_num'])
+                print(' '.join(ans))
+                timer()
+        elif event.type == FRIGHTENED_EVENT_ID:
+            game_parameters['mod'] = 'half_frightened'
+        elif event.type == HALF_FRIGHTENED_EVENT_ID:
+            game_parameters['mod'] = game_parameters['saved mod']
+            timer(pygame.time.get_ticks() - game_parameters['stopped timer'])
+
+
+def change_mod():
+    if game_parameters['timer_num'] % 2 == 0:
+        game_parameters['mod'] = 'scatter'
+    else:
+        game_parameters['mod'] = 'chase'
+    change_way()
 
 
 def draw_rect():
@@ -25,10 +46,29 @@ def update_fps():
     return fps_text
 
 
+def timer(time=None):
+    for i in LEVEL_TIME_CHANGE:
+        try:
+            if str(game_parameters['level']) in i:
+                if time is None:
+                    time = int(LEVEL_TIME_CHANGE[i][game_parameters['timer_num']] * 1000)
+                    game_parameters['timer_num'] += 1
+                pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
+                break
+        except Exception:
+            pass
+
+
 def check_game_status():
     if game_parameters['mod'] == 'game over':
-        game_parameters['mod'] = 'chase'
+        pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
+        game_parameters['mod'] = 'scatter'
+        game_parameters['timer_num'] = 0
         generate_level(game_parameters['map'])
+        timer()
+    elif game_parameters['mod'] == 'stop':
+        pygame.time.wait(1000)
+        game_parameters['mod'] = 'frightened'
 
 
 if __name__ == '__main__':
@@ -39,6 +79,7 @@ if __name__ == '__main__':
 
     font = pygame.font.SysFont("Arial", 18)
 
+    timer()
     clock = pygame.time.Clock()
     running = True
     #start_screen(screen)

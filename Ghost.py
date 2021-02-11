@@ -53,6 +53,8 @@ class Ghost(pygame.sprite.Sprite):
     def dead(self):
         self.alive = False
         self.frame = 0
+        self.image = self.sprites['points'][game_parameters['ate ghosts']]
+        self.mask = pygame.mask.from_surface(self.image)
 
     def sprite_changes(self):
         if self.alive is True:
@@ -60,13 +62,15 @@ class Ghost(pygame.sprite.Sprite):
         else:
             mod = 'dead'
 
-        if game_parameters['mod'] != 'frightened' or self.alive is False:
+        if game_parameters['mod'] != 'frightened' and game_parameters['mod'] != 'half_frightened' or self.alive is False:
             path = self.sprites[mod][self.action]
+            frame_speed = 0.2
         else:
             path = self.sprites[mod]
+            frame_speed = 0.1
 
         actions = self.ghost_speed_change()
-        self.frame = (self.frame + 0.2) % len(path)
+        self.frame = (self.frame + frame_speed) % len(path)
         self.image = path[int(self.frame)]
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -75,26 +79,24 @@ class Ghost(pygame.sprite.Sprite):
         move_x = actions[self.action][1]
         move_y = actions[self.action][0]
 
-        next_x = center_x + move_x
-        next_y = center_y + move_y
+        next_x = (center_x + move_x) % CELL_SIZE
+        next_y = (center_y + move_y) % CELL_SIZE
 
         #adjusts speed to get to the center of the cage
         if self.action in VERTICAL:
-            if center_x > MIDDLE and center_x != MIDDLE:
-                if self.action == RIGHT:
-                    if next_x > MIDDLE:
-                        move_x = MIDDLE - center_x
-                else:
-                    if next_x > MIDDLE:
-                        move_x = center_x - MIDDLE
+            if self.action == RIGHT:
+                if center_x < MIDDLE < next_x:
+                    move_x = MIDDLE - center_x
+            else:
+                if center_x > MIDDLE > next_x:
+                    move_x = MIDDLE - center_x
         else:
-            if center_y > MIDDLE and center_y != MIDDLE:
-                if self.action == DOWN:
-                    if next_y > MIDDLE:
-                        move_y = MIDDLE - center_y
-                else:
-                    if next_y < MIDDLE:
-                        move_y = MIDDLE - center_y
+            if self.action == DOWN:
+                if center_y < MIDDLE < next_y:
+                    move_y = MIDDLE - center_y
+            else:
+                if center_y > MIDDLE > next_y:
+                    move_y = MIDDLE - center_y
 
         self.real_rect_x = (self.real_rect_x + move_x) % LEN_X
         self.real_rect_y = (self.real_rect_y + move_y)
@@ -103,13 +105,14 @@ class Ghost(pygame.sprite.Sprite):
         self.rect.y = int(self.real_rect_y)
 
     def ghost_speed_change(self):
+        mod = game_parameters['mod']
         if self.alive is False:
-            speed = DEAD_GHOST_SPEED
-        elif game_parameters['mod'] == 'frightened':
+            speed = MODS_SPEED['dead']
+        elif mod == 'frightened' or mod == 'half_frightened':
             speed = MODS_SPEED['frightened']
         elif position(self) in TUNNEL_CELLS:
             speed = MODS_SPEED['tunnel']
-        elif game_parameters['mod'] == 'chase' or game_parameters['mod'] == 'scatter':
+        elif mod == 'chase' or mod == 'scatter':
             speed = self.default_speed()
         else:
             speed = 3
@@ -124,7 +127,6 @@ class Ghost(pygame.sprite.Sprite):
         return MODS_SPEED['chase']
 
     def choose_path(self):
-
         target = [(game_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
                   (game_obj['Pac-Man'].rect.y + CELL_SIZE // 2) // CELL_SIZE]
 
