@@ -12,7 +12,7 @@ def events():
         elif event.type == pygame.KEYUP:
             game_obj['Pac-Man'].key_pressed(event.key)
         elif event.type == DEFAULT_EVENT_ID:
-            if game_parameters['mod'] != 'frightened':
+            if game_parameters['mod'] != FRIGHTENED:
                 ans = ['Mod changed from', game_parameters['mod'], 'to']
                 change_mod()
                 ans.append(game_parameters['mod'])
@@ -20,7 +20,7 @@ def events():
                 print(' '.join(ans))
                 timer()
         elif event.type == FRIGHTENED_EVENT_ID:
-            game_parameters['mod'] = 'half_frightened'
+            game_parameters['mod'] = H_FRIGHTENED
         elif event.type == HALF_FRIGHTENED_EVENT_ID:
             game_parameters['mod'] = game_parameters['saved mod']
             game_parameters['ate ghosts'] = -1
@@ -29,9 +29,9 @@ def events():
 
 def change_mod():
     if game_parameters['timer_num'] % 2 == 0:
-        game_parameters['mod'] = 'scatter'
+        game_parameters['mod'] = SCATTER
     else:
-        game_parameters['mod'] = 'chase'
+        game_parameters['mod'] = CHASE
     change_way()
 
 
@@ -67,20 +67,20 @@ def draw_score():
 def check_game_score():
     if len(energizers_group) == len(foods_group) == 0:
         game_parameters['level'] += 1
-        game_parameters['mod'] = 'game over'
+        game_parameters['mod'] = GAME_OVER
 
 
 def check_game_status():
     mod = game_parameters['mod']
-    if mod == 'game over' or mod == 'attempt':
+    if mod == GAME_OVER_O or mod == ATTEMPT:
         pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
-        game_parameters['mod'] = 'scatter'
+        game_parameters['mod'] = SCATTER
         game_parameters['timer_num'] = 0
-        generate_level(game_parameters['map'], new_game=True if mod == 'game over' else False)
+        generate_level(game_parameters['map'], new_game=True if mod == GAME_OVER else False)
         timer()
-    elif game_parameters['mod'] == 'stop':
+    elif mod == ST:
         pygame.time.wait(1000)
-        game_parameters['mod'] = 'frightened'
+        game_parameters['mod'] = FRIGHTENED
 
 
 def score_update():

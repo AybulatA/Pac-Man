@@ -16,8 +16,19 @@ game_obj = {
     'Blinky': None
 }
 
+#game mods
+FRIGHTENED = 'frightened'
+H_FRIGHTENED = 'half_frightened'
+CHASE = 'chase'
+SCATTER = 'scatter'
+GAME_OVER = 'game over'
+ATTEMPT = 'attempt'
+STOP = 'stop'
+DEAD = 'dead'
+
+
 game_parameters = {
-    'mod': 'scatter',
+    'mod': SCATTER,
     'level': 1,
     'timer_num': 0,
     'ate ghosts': -1,

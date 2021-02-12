@@ -22,7 +22,7 @@ def generate_level(level, new_game=True):
             Attempts(i, 31, attempts_group, all_sprites)
 
     game_obj['Pac-Man'] = PacMan(15, 8, player_group, all_sprites)
-    game_obj['Blinky'] = Blinky(10, 1, enemy_group, all_sprites)
+    game_obj['Blinky'] = Blinky(15, 1, enemy_group, all_sprites)
     Pinky(6, 22, enemy_group, all_sprites)
     Inky(15, 5, enemy_group, all_sprites)
     Clyde(1, 22, enemy_group, all_sprites)
