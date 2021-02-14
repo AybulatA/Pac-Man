@@ -25,8 +25,7 @@ def load_image(name, colorkey=None, key_path=None):
 def load_level(filename):
     filename = "data/" + filename
     with open(filename, encoding='utf-8') as mapFile:
-        map = [line for line in mapFile]
-    return map
+        return [line for line in mapFile]
 
 
 def terminate():
