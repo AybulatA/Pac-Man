@@ -10,6 +10,8 @@ class Ghost(pygame.sprite.Sprite):
         self.frame = 0
         self.action = LEFT
         self.alive = True
+        self.at_home = True
+        self.frightened = False
 
         self.name = name
         self.sprites = load_and_resize_sprites(self.name)
@@ -27,20 +29,31 @@ class Ghost(pygame.sprite.Sprite):
         self.real_rect_y = self.rect.y
 
     def update(self):
+        pos = position(self)
+        mod = game_parameters['mod']
+        if pos in HOME and self.alive is False:
+            self.alive = True
+            self.at_home = True
+            self.action = opposite_keys[self.action]
+            self.frightened = False
+
+        if mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home\
+                and pos not in HOME_WITH_DOORS:      #when the ghost leaves the house, its mod can be chase or scatter
+            self.at_home = False
+
         keys = self.find_action()
+
         if len(keys) == 1:
             self.action = keys[0]
         else:
-            if game_parameters['mod'] == FRIGHTENED and self.alive:
+            if self.frightened and self.alive:
                 self.action = random(keys)
             else:
-                if position(self) == HOME_POS and self.alive is False:
-                    self.alive = True
-                    self.kill()
-                    return None
-                if self.alive is False:
-                    target = HOME_POS
-                elif game_parameters['mod'] == SCATTER:
+                if self.at_home:
+                    target = [12, 11]
+                elif self.alive is False:
+                    target = HOME_TAR
+                elif mod == SCATTER:
                     target = target_in_scatter_mod[self.name]
                 else:
                     target = self.choose_path()
@@ -57,12 +70,15 @@ class Ghost(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
     def sprite_changes(self):
-        if self.alive is True:
+        if self.at_home:
+            mod = CHASE
+        elif self.alive is True:
             mod = game_parameters['mod']
         else:
             mod = DEAD
 
-        if game_parameters['mod'] != FRIGHTENED and game_parameters['mod'] != H_FRIGHTENED or self.alive is False:
+        if (mod != FRIGHTENED and mod != H_FRIGHTENED and
+                self.frightened is False or self.alive is False) or self.at_home:
             path = self.sprites[mod][self.action]
             frame_speed = 0.2
         else:
@@ -106,6 +122,8 @@ class Ghost(pygame.sprite.Sprite):
 
     def ghost_speed_change(self):
         mod = game_parameters['mod']
+        if self.at_home:
+            mod = CHASE
         if self.alive is False:
             speed = MODS_SPEED[DEAD]
         elif mod == FRIGHTENED or mod == H_FRIGHTENED:
@@ -141,10 +159,10 @@ class Ghost(pygame.sprite.Sprite):
         return target
 
     def find_action(self):
-        if self.alive:
-            point = None
-        else:
+        if self.at_home or self.alive is False:
             point = '_'
+        else:
+            point = None
         keys = possible_keys(self, point)
 
         if len(keys) == 1:

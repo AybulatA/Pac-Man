@@ -24,6 +24,7 @@ def events():
         elif event.type == HALF_FRIGHTENED_EVENT_ID:
             game_parameters['mod'] = game_parameters['saved mod']
             game_parameters['ate ghosts'] = -1
+            change_frightened(False)
             timer(pygame.time.get_ticks() - game_parameters['stopped timer'])
 
 
@@ -65,21 +66,33 @@ def draw_score():
 
 
 def check_game_score():
-    if len(energizers_group) == len(foods_group) == 0:
+    if len(energizers_group) == len(foods_group) == 0 and game_parameters['mod'] != GAME_OVER:
         game_parameters['level'] += 1
-        game_parameters['mod'] = GAME_OVER
+        game_parameters['mod'] = ROUND_OVER
 
 
 def check_game_status():
     mod = game_parameters['mod']
-    if mod == GAME_OVER_O or mod == ATTEMPT:
-        pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
+    if mod == ROUND_OVER or mod == ATTEMPT:
         game_parameters['mod'] = SCATTER
         game_parameters['timer_num'] = 0
-        generate_level(game_parameters['map'], new_game=True if mod == GAME_OVER else False)
+        change_frightened(False)
+
+        #reset timers
+        pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
+        pygame.time.set_timer(FRIGHTENED_EVENT_ID, 0, True)
+        pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, 0, True)
+
+        if mod == ROUND_OVER:
+            kill_all_sprites()
+
+        param = True if mod == ROUND_OVER else False
+        generate_level(game_parameters['map'], new_game=param)
         timer()
-    elif mod == ST:
-        pygame.time.wait(1000)
+    elif mod == GAME_OVER:
+        pass
+    elif mod == STOP:
+        pygame.time.wait(500)
         game_parameters['mod'] = FRIGHTENED
 
 

@@ -63,7 +63,7 @@ class PacMan(pygame.sprite.Sprite):
             self.frame = self.frame + frame_speed
 
             if self.frame >= len(sprites['dead']) and self.alive is False:
-                kill_all_sprites()
+                kill_attempt_and_reset_game()
                 return None
 
             if self.alive:
@@ -95,6 +95,7 @@ class PacMan(pygame.sprite.Sprite):
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
             game_parameters['saved mod'] = game_parameters['mod']
             game_parameters['mod'] = FRIGHTENED
+            change_frightened(True)
             score += 50
             stop_timer()
             change_way()

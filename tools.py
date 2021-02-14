@@ -184,6 +184,11 @@ def cell_center(obj):
 
 
 def kill_all_sprites():
+    for obj in all_sprites:
+        obj.kill()
+
+
+def kill_attempt_and_reset_game():
     n = len(attempts_group)
     for i in all_sprites:
         if i in player_group or i in enemy_group or n == 0:
@@ -203,8 +208,13 @@ def kill_all_sprites():
 
 def change_way():
     for ghost in enemy_group:
-        if ghost.alive:
+        if ghost.alive and ghost.at_home is False:
             ghost.action = opposite_keys[ghost.action]
+
+
+def change_frightened(b):
+    for i in enemy_group:
+        i.frightened = b
 
 
 #in frightened mod timer stops

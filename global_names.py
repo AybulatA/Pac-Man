@@ -22,6 +22,7 @@ H_FRIGHTENED = 'half_frightened'
 CHASE = 'chase'
 SCATTER = 'scatter'
 GAME_OVER = 'game over'
+ROUND_OVER = 'round over'
 ATTEMPT = 'attempt'
 STOP = 'stop'
 DEAD = 'dead'
@@ -96,7 +97,13 @@ TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
 
 BLOCK_CELLS = [[12, 11], [15, 11], [15, 23], [12, 23]]
 
-HOME_POS = [13, 15]
+HOME_TAR = [13, 15]
+h = [[i, 13] for i in range(11, 17)]
+h.extend([[i, 14] for i in range(11, 17)])
+h.extend([[i, 15] for i in range(11, 17)])
+HOME = h.copy()
+h.extend([[13, 12], [14, 12]])
+HOME_WITH_DOORS = h.copy()
 
 target_in_scatter_mod = {
     'Blinky': (25, 0),
