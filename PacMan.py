@@ -14,7 +14,7 @@ class PacMan(pygame.sprite.Sprite):
         self.temporary_action = None
         self.alive = True
 
-        self.rect = self.image.get_rect().move(CELL_SIZE * pos_x - CELL_SIZE // 4,
+        self.rect = self.image.get_rect().move(CELL_SIZE * pos_x + CELL_SIZE // 4,
                                                CELL_SIZE * pos_y - CELL_SIZE // 4)
 
         self.mask = pygame.mask.from_surface(self.image)
@@ -35,12 +35,15 @@ class PacMan(pygame.sprite.Sprite):
         self.action = None
 
     def update(self):
+        return None
         score = 0
         mod = game_parameters['mod']
         enemy = pygame.sprite.spritecollide(self, enemy_group, False)
         if len(enemy) != 0:
             enemy = enemy[0]
-            if position(self) == position(enemy) and enemy.alive is True:
+            x = abs(enemy.rect.x - self.rect.x)
+            y = abs(enemy.rect.y - self.rect.y)
+            if (position(self) == position(enemy) or x < 6 or y < 6) and enemy.alive is True:
                 if mod == FRIGHTENED or mod == H_FRIGHTENED:
                     game_parameters['ate ghosts'] += 1
                     game_parameters['mod'] = STOP
@@ -99,4 +102,5 @@ class PacMan(pygame.sprite.Sprite):
             score += 50
             stop_timer()
             change_way()
+        game_parameters['score per round'] += score
         game_parameters['score'] += score

@@ -13,7 +13,8 @@ attempts_group = pygame.sprite.Group()
 
 game_obj = {
     'Pac-Man': None,
-    'Blinky': None
+    'Blinky': None,
+    'Border': None
 }
 
 #game mods
@@ -36,7 +37,8 @@ game_parameters = {
     'stopped timer': 0,
     'saved mod': None,
     'map': None,
-    'score': 0
+    'score': 0,
+    'score per round': 0
 }
 
 #screen options

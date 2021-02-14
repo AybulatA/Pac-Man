@@ -55,10 +55,10 @@ if __name__ == '__main__':
 
     clock = pygame.time.Clock()
     running = True
-    fon = load_image('dead_5.png', key_path='Pac-Man', colorkey=BLACK)
+    fon = load_image('field.jpg', colorkey=BLACK)
+    screen.fill((255, 255, 255))
+    screen.blit(fon, (10, 10))
     while running:
-        screen.fill((255, 255, 255))
-        screen.blit(fon, (10, 10))
         #draw_rect()
         pygame.display.flip()
     pygame.quit()

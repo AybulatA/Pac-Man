@@ -6,6 +6,7 @@ from Ghost import Ghost
 class Clyde(Ghost):
     def __init__(self, pos_x, pos_y, first_gr, second_gr):
         super().__init__(pos_x, pos_y, first_gr, second_gr, 'Clyde')
+        self.points_to_leave = 90
 
     def new_target(self, target):
         pos = position(self)

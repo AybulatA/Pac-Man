@@ -18,7 +18,6 @@ def load_image(name, colorkey=None, key_path=None):
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
-    image = pygame.image.load(fullname)
     return image
 
 

@@ -8,10 +8,11 @@ class Ghost(pygame.sprite.Sprite):
         super().__init__(first_gr, second_gr)
 
         self.frame = 0
-        self.action = LEFT
+        self.action = DOWN
         self.alive = True
         self.at_home = True
         self.frightened = False
+        self.points_to_leave = 0      #ghosts can leave only with a certain number of points per round
 
         self.name = name
         self.sprites = load_and_resize_sprites(self.name)
@@ -22,46 +23,53 @@ class Ghost(pygame.sprite.Sprite):
 
         self.target = Target(0, 0, all_sprites)
 
-        self.rect = self.image.get_rect().move(CELL_SIZE * pos_x - CELL_SIZE // 4,
-                                               CELL_SIZE * pos_y - CELL_SIZE // 4)
+        self.rect = self.image.get_rect().move(CELL_SIZE * pos_x + CELL_SIZE // 4,
+                                               CELL_SIZE * pos_y + CELL_SIZE // 4)
 
         self.real_rect_x = self.rect.x
         self.real_rect_y = self.rect.y
 
     def update(self):
-        pos = position(self)
-        mod = game_parameters['mod']
-        if pos in HOME and self.alive is False:
-            self.alive = True
-            self.at_home = True
-            self.action = opposite_keys[self.action]
-            self.frightened = False
-
-        if mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home\
-                and pos not in HOME_WITH_DOORS:      #when the ghost leaves the house, its mod can be chase or scatter
-            self.at_home = False
-
-        keys = self.find_action()
-
-        if len(keys) == 1:
-            self.action = keys[0]
+        if self.points_to_leave - game_parameters['score per round'] > 0:
+            self.behavior_at_home()
         else:
-            if self.frightened and self.alive:
-                self.action = random(keys)
-            else:
-                if self.at_home:
-                    target = [12, 11]
-                elif self.alive is False:
-                    target = HOME_TAR
-                elif mod == SCATTER:
-                    target = target_in_scatter_mod[self.name]
-                else:
-                    target = self.choose_path()
+            pos = position(self)
+            mod = game_parameters['mod']
+            if pos in HOME and self.alive is False:
+                self.alive = True
+                self.at_home = True
+                self.action = opposite_keys[self.action]
+                self.frightened = False
 
-                self.targeting(target, keys)
+            if mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home\
+                    and pos not in HOME_WITH_DOORS:      #when the ghost leaves the house, its mod can be chase or scatter
+                self.at_home = False
+
+            keys = self.find_action()
+
+            if len(keys) == 1:
+                self.action = keys[0]
+            else:
+                if self.frightened and self.alive:
+                    self.action = random(keys)
+                else:
+                    if self.at_home:
+                        target = [12, 11]
+                    elif self.alive is False:
+                        target = HOME_TAR
+                    elif mod == SCATTER:
+                        target = target_in_scatter_mod[self.name]
+                    else:
+                        target = self.choose_path()
+
+                    self.targeting(target, keys)
 
         if game_parameters['mod'] != STOP:
             self.sprite_changes()
+
+    def behavior_at_home(self):
+        if pygame.sprite.collide_mask(self, game_obj['Border']):
+            self.action = opposite_keys[self.action]
 
     def dead(self):
         self.alive = False
@@ -98,7 +106,7 @@ class Ghost(pygame.sprite.Sprite):
         next_x = (center_x + move_x) % CELL_SIZE
         next_y = (center_y + move_y) % CELL_SIZE
 
-        #adjusts speed to get to the center of the cage
+        #adjusts speed to get to the center of the cell
         if self.action in VERTICAL:
             if self.action == RIGHT:
                 if center_x < MIDDLE < next_x:

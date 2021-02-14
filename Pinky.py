@@ -5,6 +5,9 @@ from Ghost import Ghost
 class Pinky(Ghost):
     def __init__(self, pos_x, pos_y, first_gr, second_gr):
         super().__init__(pos_x, pos_y, first_gr, second_gr, 'Pinky')
+        self.action = UP
+        self.image = self.sprites[game_parameters['mod']][self.action][self.frame]
+        self.points_to_leave = 30
 
     def new_target(self, target):
         act = game_obj['Pac-Man'].action

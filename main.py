@@ -49,16 +49,16 @@ def update_fps():
 
 
 def timer(time=None):
+    game_parameters['timer_num'] += 1
+    if time is not None:
+        pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
+        return None
     for i in LEVEL_TIME_CHANGE:
-        try:
-            if str(game_parameters['level']) in i:
-                if time is None:
-                    time = int(LEVEL_TIME_CHANGE[i][game_parameters['timer_num']] * 1000)
-                    game_parameters['timer_num'] += 1
-                pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
-                break
-        except Exception:
-            pass
+        if str(game_parameters['level']) in i:
+            time = int(LEVEL_TIME_CHANGE[i][game_parameters['timer_num']] * 1000)
+    if time is None:
+        time = int(LEVEL_TIME_CHANGE['infinity'][game_parameters['timer_num']] * 1000)
+    pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
 
 
 def draw_score():
@@ -76,6 +76,7 @@ def check_game_status():
     if mod == ROUND_OVER or mod == ATTEMPT:
         game_parameters['mod'] = SCATTER
         game_parameters['timer_num'] = 0
+        game_parameters['score per round'] = 0
         change_frightened(False)
 
         #reset timers
@@ -115,7 +116,6 @@ if __name__ == '__main__':
     #start_screen(screen)
     game_parameters['map'] = load_level('map.txt')
     generate_level(game_parameters['map'])
-    print(len(foods_group))
     #fon = pygame.transform.scale(load_image('field.jpg'), (CELL_SIZE * 28, CELL_SIZE * 31))
     while running:
         check_game_score()
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         all_sprites.update()
         all_sprites.draw(screen)
         clock.tick(FPS)
-        #draw_rect()
+        draw_rect()
         pygame.display.flip()
         #game_parameters['mod'] = 'frightened'
     pygame.quit()
