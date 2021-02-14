@@ -41,9 +41,9 @@ class PacMan(pygame.sprite.Sprite):
         if len(enemy) != 0:
             enemy = enemy[0]
             if position(self) == position(enemy) and enemy.alive is True:
-                if mod == 'frightened' or mod == 'half_frightened':
+                if mod == FRIGHTENED or mod == H_FRIGHTENED:
                     game_parameters['ate ghosts'] += 1
-                    game_parameters['mod'] = 'stop'
+                    game_parameters['mod'] = STOP
                     enemy.dead()
                     score += (2 ** game_parameters['ate ghosts']) * 200
                 else:
@@ -94,7 +94,7 @@ class PacMan(pygame.sprite.Sprite):
             score += 10
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
             game_parameters['saved mod'] = game_parameters['mod']
-            game_parameters['mod'] = 'frightened'
+            game_parameters['mod'] = FRIGHTENED
             score += 50
             stop_timer()
             change_way()

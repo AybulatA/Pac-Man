@@ -193,17 +193,18 @@ def kill_all_sprites():
             if n == 1:
                 i.kill()
             n -= 1
-        game_parameters['mod'] = 'attempt'
+        game_parameters['mod'] = ATTEMPT
     else:
         game_parameters['score'] = 0
         game_parameters['level'] = 1
 
-        game_parameters['mod'] = 'game over'
+        game_parameters['mod'] = GAME_OVER
 
 
 def change_way():
-    for i in enemy_group:
-        i.action = opposite_keys[i.action]
+    for ghost in enemy_group:
+        if ghost.alive:
+            ghost.action = opposite_keys[ghost.action]
 
 
 #in frightened mod timer stops

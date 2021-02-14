@@ -31,7 +31,7 @@ class Ghost(pygame.sprite.Sprite):
         if len(keys) == 1:
             self.action = keys[0]
         else:
-            if game_parameters['mod'] == 'frightened' and self.alive:
+            if game_parameters['mod'] == FRIGHTENED and self.alive:
                 self.action = random(keys)
             else:
                 if position(self) == HOME_POS and self.alive is False:
@@ -40,14 +40,14 @@ class Ghost(pygame.sprite.Sprite):
                     return None
                 if self.alive is False:
                     target = HOME_POS
-                elif game_parameters['mod'] == 'scatter':
+                elif game_parameters['mod'] == SCATTER:
                     target = target_in_scatter_mod[self.name]
                 else:
                     target = self.choose_path()
 
                 self.targeting(target, keys)
 
-        if game_parameters['mod'] != 'stop':
+        if game_parameters['mod'] != STOP:
             self.sprite_changes()
 
     def dead(self):
@@ -60,9 +60,9 @@ class Ghost(pygame.sprite.Sprite):
         if self.alive is True:
             mod = game_parameters['mod']
         else:
-            mod = 'dead'
+            mod = DEAD
 
-        if game_parameters['mod'] != 'frightened' and game_parameters['mod'] != 'half_frightened' or self.alive is False:
+        if game_parameters['mod'] != FRIGHTENED and game_parameters['mod'] != H_FRIGHTENED or self.alive is False:
             path = self.sprites[mod][self.action]
             frame_speed = 0.2
         else:
@@ -107,12 +107,12 @@ class Ghost(pygame.sprite.Sprite):
     def ghost_speed_change(self):
         mod = game_parameters['mod']
         if self.alive is False:
-            speed = MODS_SPEED['dead']
-        elif mod == 'frightened' or mod == 'half_frightened':
-            speed = MODS_SPEED['frightened']
+            speed = MODS_SPEED[DEAD]
+        elif mod == FRIGHTENED or mod == H_FRIGHTENED:
+            speed = MODS_SPEED[FRIGHTENED]
         elif position(self) in TUNNEL_CELLS:
             speed = MODS_SPEED['tunnel']
-        elif mod == 'chase' or mod == 'scatter':
+        elif mod == CHASE or mod == SCATTER:
             speed = self.default_speed()
         else:
             speed = 3
@@ -124,7 +124,7 @@ class Ghost(pygame.sprite.Sprite):
         }
 
     def default_speed(self):
-        return MODS_SPEED['chase']
+        return MODS_SPEED[CHASE]
 
     def choose_path(self):
         target = [(game_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
