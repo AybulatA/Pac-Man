@@ -49,20 +49,21 @@ def update_fps():
 
 
 def timer(time=None):
-    game_parameters['timer_num'] += 1
     if time is not None:
         pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
         return None
     for i in LEVEL_TIME_CHANGE:
-        if str(game_parameters['level']) in i:
+        if str(game_parameters['level']) in i.split(' '):
             time = int(LEVEL_TIME_CHANGE[i][game_parameters['timer_num']] * 1000)
     if time is None:
         time = int(LEVEL_TIME_CHANGE['infinity'][game_parameters['timer_num']] * 1000)
     pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
+    game_parameters['timer_num'] += 1
 
 
-def draw_score():
-    return font.render(str(game_parameters['score']), 1, pygame.Color("white"))
+def update_level():
+    text = str(game_parameters['level']) + 'UP'
+    return font.render(text, 1, pygame.Color("white"))
 
 
 def check_game_score():
@@ -73,25 +74,26 @@ def check_game_score():
 
 def check_game_status():
     mod = game_parameters['mod']
-    if mod == ROUND_OVER or mod == ATTEMPT:
+    if mod in [ROUND_OVER, ATTEMPT, GAME_OVER]:
         game_parameters['mod'] = SCATTER
         game_parameters['timer_num'] = 0
         game_parameters['score per round'] = 0
         change_frightened(False)
+
+        if mod == GAME_OVER:
+            game_parameters['score'] = 0
+            game_parameters['saved mod'] = None
+            game_parameters['ate ghosts'] = -1
+            game_parameters['stopped timer'] = 0
 
         #reset timers
         pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
         pygame.time.set_timer(FRIGHTENED_EVENT_ID, 0, True)
         pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, 0, True)
 
-        if mod == ROUND_OVER:
-            kill_all_sprites()
-
-        param = True if mod == ROUND_OVER else False
+        param = True if mod in [ROUND_OVER, GAME_OVER] else False
         generate_level(game_parameters['map'], new_game=param)
         timer()
-    elif mod == GAME_OVER:
-        pass
     elif mod == STOP:
         pygame.time.wait(500)
         game_parameters['mod'] = FRIGHTENED
@@ -114,6 +116,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     running = True
     #start_screen(screen)
+    load_sprites()
     game_parameters['map'] = load_level('map.txt')
     generate_level(game_parameters['map'])
     #fon = pygame.transform.scale(load_image('field.jpg'), (CELL_SIZE * 28, CELL_SIZE * 31))
@@ -125,10 +128,11 @@ if __name__ == '__main__':
         events()
         screen.blit(update_fps(), (CELL_SIZE * 29, 0))
         screen.blit(score_update(), (CELL_SIZE * 29, CELL_SIZE * 3))
+        screen.blit(update_level(), (CELL_SIZE * 29, CELL_SIZE * 4))
         all_sprites.update()
         all_sprites.draw(screen)
         clock.tick(FPS)
-        draw_rect()
+        #draw_rect()
         pygame.display.flip()
         #game_parameters['mod'] = 'frightened'
     pygame.quit()

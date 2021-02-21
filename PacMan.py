@@ -2,19 +2,18 @@ from global_names import *
 from tools import *
 import pygame
 
-sprites = load_and_resize_sprites('Pac-Man')
-
 
 class PacMan(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
         self.frame = 0
         self.action = LEFT
-        self.image = sprites['start_image'][self.frame]
+        self.sprite = SPRITES['Pac-Man']
+        self.image = self.sprite['start_image'][self.frame]
         self.temporary_action = None
         self.alive = True
 
-        self.rect = self.image.get_rect().move(CELL_SIZE * pos_x + CELL_SIZE // 4,
+        self.rect = self.image.get_rect().move(CELL_SIZE * pos_x - CELL_SIZE // 4,
                                                CELL_SIZE * pos_y - CELL_SIZE // 4)
 
         self.mask = pygame.mask.from_surface(self.image)
@@ -23,10 +22,7 @@ class PacMan(pygame.sprite.Sprite):
         self.real_rect_y = self.rect.y
 
     def key_pressed(self, key):
-        if key in possible_keys(self):
-            self.action = key
-        else:
-            self.temporary_action = ((self.rect.x, self.rect.y), key)
+        self.temporary_action = ((self.rect.x, self.rect.y), key)
 
     def dead(self):
         self.alive = False
@@ -35,7 +31,6 @@ class PacMan(pygame.sprite.Sprite):
         self.action = None
 
     def update(self):
-        return None
         score = 0
         mod = game_parameters['mod']
         enemy = pygame.sprite.spritecollide(self, enemy_group, False)
@@ -43,7 +38,7 @@ class PacMan(pygame.sprite.Sprite):
             enemy = enemy[0]
             x = abs(enemy.rect.x - self.rect.x)
             y = abs(enemy.rect.y - self.rect.y)
-            if (position(self) == position(enemy) or x < 6 or y < 6) and enemy.alive is True:
+            if (position(self) == position(enemy) or (x < 3 and y < 3)) and enemy.alive is True:
                 if mod == FRIGHTENED or mod == H_FRIGHTENED:
                     game_parameters['ate ghosts'] += 1
                     game_parameters['mod'] = STOP
@@ -60,12 +55,12 @@ class PacMan(pygame.sprite.Sprite):
 
         if self.action in possible_keys(self) or self.alive is False:
             if self.alive is True:
-                path = sprites['alive'][self.action]
+                path = self.sprite['alive'][self.action]
             else:
-                path = sprites['dead']
+                path = self.sprite['dead']
             self.frame = self.frame + frame_speed
 
-            if self.frame >= len(sprites['dead']) and self.alive is False:
+            if self.frame >= len(self.sprite['dead']) and self.alive is False:
                 kill_attempt_and_reset_game()
                 return None
 
@@ -76,8 +71,9 @@ class PacMan(pygame.sprite.Sprite):
             self.mask = pygame.mask.from_surface(self.image)
 
             if self.alive is True:
-                self.real_rect_x = (self.real_rect_x + actions[self.action][1]) % LEN_X
-                self.real_rect_y = (self.real_rect_y + actions[self.action][0])
+                move_x, move_y = correct_move(self, actions)
+                self.real_rect_x = (self.real_rect_x + move_x) % LEN_X
+                self.real_rect_y = (self.real_rect_y + move_y)
 
                 self.rect.x = int(self.real_rect_x)
                 self.rect.y = int(self.real_rect_y)

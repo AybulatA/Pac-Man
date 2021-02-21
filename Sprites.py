@@ -5,7 +5,7 @@ from global_names import *
 class Border(pygame.sprite.Sprite):
     def __init__(self, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
-        self.image = pygame.transform.scale(load_image('field.jpg', colorkey=BLACK),
+        self.image = pygame.transform.scale(SPRITES['Border'],
                                             (CELL_SIZE * 28, CELL_SIZE * 31))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -53,9 +53,7 @@ class Target(pygame.sprite.Sprite):
 class Attempts(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, fr_gr, sec_gr):
         super().__init__(fr_gr, sec_gr)
-        im = load_image('right(first).png', key_path='Pac-Man')
-        im = pygame.transform.flip(im, True, False)
-        self.image = pygame.transform.scale(im, (int(CELL_SIZE),
-                                                 int(CELL_SIZE)))
+        self.image = pygame.transform.scale(SPRITES['Attempts'], (int(CELL_SIZE),
+                                                                  int(CELL_SIZE)))
         self.rect = self.image.get_rect().move(
             CELL_SIZE // 4 + CELL_SIZE * pos_x, CELL_SIZE // 4 + CELL_SIZE * pos_y)

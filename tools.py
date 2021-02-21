@@ -21,6 +21,16 @@ def load_image(name, colorkey=None, key_path=None):
     return image
 
 
+def load_sprites():
+    names = ['Blinky', 'Pinky', 'Clyde', 'Inky', 'Pac-Man']
+    for name in names:
+        SPRITES[name] = load_and_resize_sprites(name)
+    SPRITES['Border'] = load_image('field.jpg', colorkey=BLACK)
+
+    im = load_image('right(first).png', key_path='Pac-Man')
+    SPRITES['Attempts'] = pygame.transform.flip(im, True, False)
+
+
 def load_level(filename):
     filename = "data/" + filename
     with open(filename, encoding='utf-8') as mapFile:
@@ -213,7 +223,8 @@ def change_way():
 
 def change_frightened(b):
     for i in enemy_group:
-        i.frightened = b
+        if i.at_home is False:
+            i.frightened = b
 
 
 #in frightened mod timer stops
@@ -222,3 +233,30 @@ def stop_timer():
     time = 6000 / 19 * (19 - game_parameters['level'])
     pygame.time.set_timer(FRIGHTENED_EVENT_ID, int(time), True)
     pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, int(time) + 2000, True)
+
+
+# adjusts speed to get to the center of the cell
+def correct_move(obj, actions):
+        center_x, center_y = cell_center(obj)
+
+        move_x = actions[obj.action][1]
+        move_y = actions[obj.action][0]
+
+        next_x = (center_x + move_x) % CELL_SIZE
+        next_y = (center_y + move_y) % CELL_SIZE
+
+        if obj.action in VERTICAL:
+            if obj.action == RIGHT:
+                if center_x < MIDDLE < next_x:
+                    move_x = MIDDLE - center_x
+            else:
+                if center_x > MIDDLE > next_x:
+                    move_x = MIDDLE - center_x
+        else:
+            if obj.action == DOWN:
+                if center_y < MIDDLE < next_y:
+                    move_y = MIDDLE - center_y
+            else:
+                if center_y > MIDDLE > next_y:
+                    move_y = MIDDLE - center_y
+        return (move_x, move_y)

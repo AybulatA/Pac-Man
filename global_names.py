@@ -41,6 +41,8 @@ game_parameters = {
     'score per round': 0
 }
 
+SPRITES = dict()
+
 #screen options
 WIDTH, HEIGHT = 1000, 1000
 FPS = 60
@@ -108,10 +110,10 @@ h.extend([[13, 12], [14, 12]])
 HOME_WITH_DOORS = h.copy()
 
 target_in_scatter_mod = {
-    'Blinky': (26, 0),
-    'Pinky': (2, 0),
-    'Inky': (27, 31),
-    'Clyde': (0, 31)
+    'Blinky': (26, -3),
+    'Pinky': (2, -3),
+    'Inky': (27, 34),
+    'Clyde': (0, 34)
 }
 
 LEVEL_TIME_CHANGE = {

@@ -8,14 +8,18 @@ class Ghost(pygame.sprite.Sprite):
         super().__init__(first_gr, second_gr)
 
         self.frame = 0
-        self.action = DOWN
+        self.action = UP
         self.alive = True
         self.at_home = True
         self.frightened = False
+        self.newborn = {
+            'status': True,
+            'action': UP
+        }
         self.points_to_leave = 0      #ghosts can leave only with a certain number of points per round
 
         self.name = name
-        self.sprites = load_and_resize_sprites(self.name)
+        self.sprites = SPRITES[name]
         self.image = self.sprites[game_parameters['mod']][self.action][self.frame]
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -30,21 +34,22 @@ class Ghost(pygame.sprite.Sprite):
         self.real_rect_y = self.rect.y
 
     def update(self):
-        if self.points_to_leave - game_parameters['score per round'] > 0:
-            self.behavior_at_home()
-        else:
+        if self.newborn['status'] is True:
             pos = position(self)
-            mod = game_parameters['mod']
-            if pos in HOME and self.alive is False:
-                self.alive = True
-                self.at_home = True
-                self.action = opposite_keys[self.action]
-                self.frightened = False
+            if pygame.sprite.collide_mask(self, game_obj['Border']):
+                if self.points_to_leave - game_parameters['score per round'] > 0:
+                    self.action = opposite_keys[self.action]
+                else:
+                    if pos[0] != 13:
+                        self.action = self.newborn['action']
+                    else:
+                        self.action = UP
 
-            if mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home\
-                    and pos not in HOME_WITH_DOORS:      #when the ghost leaves the house, its mod can be chase or scatter
-                self.at_home = False
-
+            if pos not in HOME_WITH_DOORS and cell_center(self)[-1] == MIDDLE:
+                self.newborn['status'] = False
+                self.action = LEFT
+        else:
+            self.is_ghost_at_home()
             keys = self.find_action()
 
             if len(keys) == 1:
@@ -53,26 +58,31 @@ class Ghost(pygame.sprite.Sprite):
                 if self.frightened and self.alive:
                     self.action = random(keys)
                 else:
-                    if self.at_home:
-                        target = [12, 11]
-                    elif self.alive is False:
-                        target = HOME_TAR
-                    elif mod == SCATTER:
-                        target = target_in_scatter_mod[self.name]
-                    else:
-                        target = self.choose_path()
-
-                    self.targeting(target, keys)
-
-                    self.target.rect.x = target[0] * CELL_SIZE
-                    self.target.rect.y = target[1] * CELL_SIZE
+                    self.action = self.targeting(self.choose_target(), keys)
 
         if game_parameters['mod'] != STOP:
             self.sprite_changes()
 
-    def behavior_at_home(self):
-        if pygame.sprite.collide_mask(self, game_obj['Border']):
+    def choose_target(self):
+        if self.at_home:
+            return [12, 11]
+        elif self.alive is False:
+            return HOME_TAR
+        elif game_parameters['mod'] == SCATTER:
+            return target_in_scatter_mod[self.name]
+        return self.choose_path()
+
+    def is_ghost_at_home(self):
+        pos = position(self)
+        mod = game_parameters['mod']
+        if pos in HOME and self.alive is False:
+            self.alive = True
+            self.at_home = True
             self.action = opposite_keys[self.action]
+            self.frightened = False
+        elif mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home \
+                and pos not in HOME_WITH_DOORS:  # when the ghost leaves the house, its mod can be chase or scatter
+            self.at_home = False
 
     def dead(self):
         self.alive = False
@@ -96,34 +106,11 @@ class Ghost(pygame.sprite.Sprite):
             path = self.sprites[mod]
             frame_speed = 0.1
 
-        actions = self.ghost_speed_change()
         self.frame = (self.frame + frame_speed) % len(path)
         self.image = path[int(self.frame)]
         self.mask = pygame.mask.from_surface(self.image)
 
-        center_x, center_y = cell_center(self)
-
-        move_x = actions[self.action][1]
-        move_y = actions[self.action][0]
-
-        next_x = (center_x + move_x) % CELL_SIZE
-        next_y = (center_y + move_y) % CELL_SIZE
-
-        #adjusts speed to get to the center of the cell
-        if self.action in VERTICAL:
-            if self.action == RIGHT:
-                if center_x < MIDDLE < next_x:
-                    move_x = MIDDLE - center_x
-            else:
-                if center_x > MIDDLE > next_x:
-                    move_x = MIDDLE - center_x
-        else:
-            if self.action == DOWN:
-                if center_y < MIDDLE < next_y:
-                    move_y = MIDDLE - center_y
-            else:
-                if center_y > MIDDLE > next_y:
-                    move_y = MIDDLE - center_y
+        move_x, move_y = correct_move(self, self.ghost_speed_change())
 
         self.real_rect_x = (self.real_rect_x + move_x) % LEN_X
         self.real_rect_y = (self.real_rect_y + move_y)
@@ -146,10 +133,10 @@ class Ghost(pygame.sprite.Sprite):
         else:
             speed = 3
         return {
-            RIGHT: (0, speed),
-            LEFT: (0, -speed),
-            DOWN: (speed, 0),
-            UP: (-speed, 0),
+            RIGHT: [0, speed],
+            LEFT: [0, -speed],
+            DOWN: [speed, 0],
+            UP: [-speed, 0],
         }
 
     def default_speed(self):
@@ -197,7 +184,10 @@ class Ghost(pygame.sprite.Sprite):
             else:
                 x = pos[0]
                 y = (-1) ** HORIZONTAL.index(i) + pos[1]
-            line = (abs(target[0] - x) ** 2 + abs(target[1] - y) ** 2) ** 0.5
+            #distance from the center of the next turn to the target
+            first = abs(target[0] * CELL_SIZE - x * CELL_SIZE)
+            second = abs(target[1] * CELL_SIZE - y * CELL_SIZE)
+            line = (first ** 2 + second ** 2) ** 0.5
             ans.append((i, (x, y), line))
 
         ans = sorted(ans, key=lambda z: z[-1])
@@ -207,5 +197,5 @@ class Ghost(pygame.sprite.Sprite):
             priority = [UP, LEFT, DOWN]
             ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
 
-        self.action = ans[0][0]
+        return ans[0][0]
 
