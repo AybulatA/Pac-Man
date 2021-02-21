@@ -64,6 +64,9 @@ class Ghost(pygame.sprite.Sprite):
 
                     self.targeting(target, keys)
 
+                    self.target.rect.x = target[0] * CELL_SIZE
+                    self.target.rect.y = target[1] * CELL_SIZE
+
         if game_parameters['mod'] != STOP:
             self.sprite_changes()
 
@@ -156,12 +159,7 @@ class Ghost(pygame.sprite.Sprite):
         target = [(game_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
                   (game_obj['Pac-Man'].rect.y + CELL_SIZE // 2) // CELL_SIZE]
 
-        target = self.new_target(target)
-
-        self.target.rect.x = target[0] * CELL_SIZE
-        self.target.rect.y = target[1] * CELL_SIZE
-
-        return target
+        return self.new_target(target)
 
     def new_target(self, target):
         return target

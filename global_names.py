@@ -108,7 +108,7 @@ h.extend([[13, 12], [14, 12]])
 HOME_WITH_DOORS = h.copy()
 
 target_in_scatter_mod = {
-    'Blinky': (25, 0),
+    'Blinky': (26, 0),
     'Pinky': (2, 0),
     'Inky': (27, 31),
     'Clyde': (0, 31)
