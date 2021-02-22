@@ -9,12 +9,20 @@ energizers_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 attempts_group = pygame.sprite.Group()
+stop_group = pygame.sprite.Group()
 
+#music
+#INTRO = pygame.mixer.Sound('data/game/intro.wav')
+
+#EATING_GHOST = pygame.mixer.Sound('data/Pac-Man/eating_ghost.wav')
+#INTERMISSION = pygame.mixer.Sound('data/Ghost/intermission.wav')
+#
 
 game_obj = {
     'Pac-Man': None,
     'Blinky': None,
-    'Border': None
+    'Border': None,
+    'Stop': None
 }
 
 #game mods
@@ -52,6 +60,13 @@ SPEED = 2.5
 DEFAULT_EVENT_ID = pygame.USEREVENT + 1
 FRIGHTENED_EVENT_ID = pygame.USEREVENT + 2
 HALF_FRIGHTENED_EVENT_ID = pygame.USEREVENT + 3
+
+CHANGE_TO_EVENT_ID = {
+    FRIGHTENED: FRIGHTENED_EVENT_ID,
+    H_FRIGHTENED: HALF_FRIGHTENED_EVENT_ID,
+    CHASE: DEFAULT_EVENT_ID,
+    SCATTER: DEFAULT_EVENT_ID
+}
 
 CELL_SIZE = 30
 
@@ -124,4 +139,5 @@ LEVEL_TIME_CHANGE = {
 
 #colors
 BLACK = pygame.Color('black')
+WHITE = pygame.Color('white')
 FOODS_COLOR = (235, 146, 52)

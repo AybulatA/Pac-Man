@@ -50,6 +50,15 @@ class Target(pygame.sprite.Sprite):
             CELL_SIZE * pos_x, CELL_SIZE * pos_y)
 
 
+class Stop(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, gr, gr2):
+        super().__init__(gr, gr2)
+        self.image = pygame.transform.scale(SPRITES['stop'], (int(CELL_SIZE) * 8,
+                                                              int(CELL_SIZE) * 8))
+        self.rect = self.image.get_rect().move(
+            CELL_SIZE * pos_x, CELL_SIZE * pos_y)
+
+
 class Attempts(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, fr_gr, sec_gr):
         super().__init__(fr_gr, sec_gr)

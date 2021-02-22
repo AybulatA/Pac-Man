@@ -2,6 +2,7 @@ import pygame
 from global_names import *
 from tools import *
 from generate_level import generate_level
+from Sprites import Stop
 
 
 def events():
@@ -10,22 +11,37 @@ def events():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYUP:
-            game_obj['Pac-Man'].key_pressed(event.key)
-        elif event.type == DEFAULT_EVENT_ID:
-            if game_parameters['mod'] != FRIGHTENED:
-                ans = ['Mod changed from', game_parameters['mod'], 'to']
-                change_mod()
-                ans.append(game_parameters['mod'])
-                print(game_parameters['timer_num'])
-                print(' '.join(ans))
-                timer()
-        elif event.type == FRIGHTENED_EVENT_ID:
-            game_parameters['mod'] = H_FRIGHTENED
-        elif event.type == HALF_FRIGHTENED_EVENT_ID:
-            game_parameters['mod'] = game_parameters['saved mod']
-            game_parameters['ate ghosts'] = -1
-            change_frightened(False)
-            timer(pygame.time.get_ticks() - game_parameters['stopped timer'])
+            key = event.key
+            if key in [UP, DOWN, LEFT, RIGHT]:
+                game_obj['Pac-Man'].key_pressed(key)
+            elif key == pygame.K_ESCAPE:
+                if game_obj['Stop'] is None:
+                    game_obj['Stop'] = Stop(10, 11, stop_group, all_sprites)
+                    game_parameters['stopped timer'] = pygame.time.get_ticks()
+                else:
+                    for i in stop_group:
+                        i.kill()
+                    game_obj['Stop'] = None
+                    timer(pygame.time.get_ticks() - game_parameters['stopped timer'],
+                          event_id=CHANGE_TO_EVENT_ID[game_parameters['mod']])
+        if game_obj['Stop'] is None:
+            if event.type == DEFAULT_EVENT_ID:
+                if game_parameters['mod'] != FRIGHTENED:
+                    ans = ['Mod changed from', game_parameters['mod'], 'to']
+                    change_mod()
+                    ans.append(game_parameters['mod'])
+                    print(game_parameters['timer_num'])
+                    print(' '.join(ans))
+                    timer()
+            elif event.type == FRIGHTENED_EVENT_ID:
+                game_parameters['mod'] = H_FRIGHTENED
+                time = time_in_frightened_mod()
+                pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, int(time * 0.5), True)
+            elif event.type == HALF_FRIGHTENED_EVENT_ID:
+                game_parameters['mod'] = game_parameters['saved mod']
+                game_parameters['ate ghosts'] = -1
+                change_frightened(False)
+                timer(pygame.time.get_ticks() - game_parameters['stopped timer'])
 
 
 def change_mod():
@@ -48,9 +64,9 @@ def update_fps():
     return fps_text
 
 
-def timer(time=None):
+def timer(time=None, event_id=None):
     if time is not None:
-        pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
+        pygame.time.set_timer(event_id if event_id is not None else DEFAULT_EVENT_ID, time, True)
         return None
     for i in LEVEL_TIME_CHANGE:
         if str(game_parameters['level']) in i.split(' '):
@@ -103,6 +119,19 @@ def score_update():
     return font_score.render(str(game_parameters['score']), 1, pygame.Color("white"))
 
 
+def start_screen():
+    pygame.mixer.music.load(os.path.join('data/game/music', 'intro.wav'))
+    pygame.mixer.music.play()
+    im = pygame.transform.scale(load_image('ready!.jpg', key_path='game'),
+                                (CELL_SIZE * 7, CELL_SIZE * 1))
+    screen.blit(im, (11 * CELL_SIZE, 17 * CELL_SIZE))
+    all_sprites.update()
+    all_sprites.draw(screen)
+    pygame.display.flip()
+    while pygame.mixer.music.get_busy():
+        pass
+
+
 if __name__ == '__main__':
     pygame.init()
     size = WIDTH, HEIGHT
@@ -112,13 +141,13 @@ if __name__ == '__main__':
     font = pygame.font.SysFont("Arial", 18)
     font_score = pygame.font.SysFont("PerfectDOSVGA437", 36)
 
-    timer()
     clock = pygame.time.Clock()
     running = True
-    #start_screen(screen)
     load_sprites()
     game_parameters['map'] = load_level('map.txt')
     generate_level(game_parameters['map'])
+    start_screen()
+    timer()
     #fon = pygame.transform.scale(load_image('field.jpg'), (CELL_SIZE * 28, CELL_SIZE * 31))
     while running:
         check_game_score()
@@ -129,7 +158,8 @@ if __name__ == '__main__':
         screen.blit(update_fps(), (CELL_SIZE * 29, 0))
         screen.blit(score_update(), (CELL_SIZE * 29, CELL_SIZE * 3))
         screen.blit(update_level(), (CELL_SIZE * 29, CELL_SIZE * 4))
-        all_sprites.update()
+        if game_obj['Stop'] is None:
+            all_sprites.update()
         all_sprites.draw(screen)
         clock.tick(FPS)
         #draw_rect()

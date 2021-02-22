@@ -6,6 +6,9 @@ import pygame
 class PacMan(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, first_gr, second_gr):
         super().__init__(first_gr, second_gr)
+        self.munch = load_music('munch.wav', key_path='Pac-Man')
+        self.death = load_music('death.wav', key_path='Pac-Man')
+        self.eat_ghost = load_music('eatghost.wav', key_path='Pac-Man')
         self.frame = 0
         self.action = LEFT
         self.sprite = SPRITES['Pac-Man']
@@ -25,6 +28,7 @@ class PacMan(pygame.sprite.Sprite):
         self.temporary_action = ((self.rect.x, self.rect.y), key)
 
     def dead(self):
+        self.death.play()
         self.alive = False
         for i in enemy_group:
             i.kill()
@@ -43,13 +47,14 @@ class PacMan(pygame.sprite.Sprite):
                     game_parameters['ate ghosts'] += 1
                     game_parameters['mod'] = STOP
                     enemy.dead()
+                    self.eat_ghost.play()
                     score += (2 ** game_parameters['ate ghosts']) * 200
                 else:
                     self.dead()
                     self.frame = 0
 
         if self.alive is False:
-            frame_speed = 0.075
+            frame_speed = 0.15
         else:
             frame_speed = 0.2
 
@@ -91,10 +96,9 @@ class PacMan(pygame.sprite.Sprite):
 
         if len(pygame.sprite.spritecollide(self, foods_group, True)) == 1:
             score += 10
+            self.munch.stop()
+            self.munch.play()
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
-            game_parameters['saved mod'] = game_parameters['mod']
-            game_parameters['mod'] = FRIGHTENED
-            change_frightened(True)
             score += 50
             stop_timer()
             change_way()

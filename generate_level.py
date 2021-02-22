@@ -16,7 +16,7 @@ def generate_level(level, new_game=True):
                     Food(x, y, foods_group, all_sprites)
                 elif level[y][x] == '0':
                     Energizer(x, y, energizers_group, all_sprites)
-        for i in range(1):
+        for i in range(3):
             Attempts(i, 31, attempts_group, all_sprites)
 
     game_obj['Pac-Man'] = PacMan(13, 23, player_group, all_sprites)

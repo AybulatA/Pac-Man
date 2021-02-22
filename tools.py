@@ -21,6 +21,18 @@ def load_image(name, colorkey=None, key_path=None):
     return image
 
 
+def load_music(name, key_path=None):
+    path = 'data'
+    if key_path is not None:
+        path += '/' + key_path
+    path += '/music'
+    fullname = os.path.join(path, name)
+    if not os.path.isfile(fullname):
+        print(f"Файл'{fullname}' не найден")
+        sys.exit()
+    return pygame.mixer.Sound(fullname)
+
+
 def load_sprites():
     names = ['Blinky', 'Pinky', 'Clyde', 'Inky', 'Pac-Man']
     for name in names:
@@ -29,6 +41,8 @@ def load_sprites():
 
     im = load_image('right(first).png', key_path='Pac-Man')
     SPRITES['Attempts'] = pygame.transform.flip(im, True, False)
+
+    SPRITES['stop'] = load_image('stop.jpg', key_path='game', colorkey=WHITE)
 
 
 def load_level(filename):
@@ -40,19 +54,6 @@ def load_level(filename):
 def terminate():
     pygame.quit()
     sys.exit()
-
-
-def start_screen(screen):
-    fon = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
-    screen.blit(fon, (0, 0))
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
-                return
-        pygame.display.flip()
 
 
 def load_pacman_sprites(sprites):
@@ -230,9 +231,16 @@ def change_frightened(b):
 #in frightened mod timer stops
 def stop_timer():
     game_parameters['stopped timer'] = pygame.time.get_ticks()
-    time = 6000 / 19 * (19 - game_parameters['level'])
+    time = time_in_frightened_mod()
     pygame.time.set_timer(FRIGHTENED_EVENT_ID, int(time), True)
-    pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, int(time) + 2000, True)
+    if time > 0:
+        game_parameters['saved mod'] = game_parameters['mod']
+        game_parameters['mod'] = FRIGHTENED
+        change_frightened(True)
+
+
+def time_in_frightened_mod():
+    return 6000 / 19 * (19 - game_parameters['level'])
 
 
 # adjusts speed to get to the center of the cell

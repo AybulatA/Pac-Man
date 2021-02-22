@@ -34,7 +34,7 @@ class Ghost(pygame.sprite.Sprite):
         self.real_rect_y = self.rect.y
 
     def update(self):
-        if self.newborn['status'] is True:
+        if self.newborn['status']:
             pos = position(self)
             if pygame.sprite.collide_mask(self, game_obj['Border']):
                 if self.points_to_leave - game_parameters['score per round'] > 0:
@@ -145,7 +145,6 @@ class Ghost(pygame.sprite.Sprite):
     def choose_path(self):
         target = [(game_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
                   (game_obj['Pac-Man'].rect.y + CELL_SIZE // 2) // CELL_SIZE]
-
         return self.new_target(target)
 
     def new_target(self, target):
@@ -157,7 +156,6 @@ class Ghost(pygame.sprite.Sprite):
         else:
             point = None
         keys = possible_keys(self, point)
-
         if len(keys) == 1:
             return keys
 
@@ -165,16 +163,14 @@ class Ghost(pygame.sprite.Sprite):
         if opposite_keys[self.action] in keys:
             keys.remove(opposite_keys[self.action])
 
-        #ghosts on these cells cannot turn up
-        if position(self) in BLOCK_CELLS:
+        #ghosts on these cells cannot turn up instead of frightened mod
+        if position(self) in BLOCK_CELLS and self.frightened is False:
             if UP in keys:
                 keys.remove(UP)
-
         return keys
 
     def targeting(self, target, keys):
         pos = position(self)
-
         ans = list()
 
         for i in keys:
@@ -191,11 +187,9 @@ class Ghost(pygame.sprite.Sprite):
             ans.append((i, (x, y), line))
 
         ans = sorted(ans, key=lambda z: z[-1])
-
         if ans[0][-1] == ans[-1][-1] and len(ans) != 1:
             #if all ways have the same length, the way will be chosen by priority
             priority = [UP, LEFT, DOWN]
             ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
-
         return ans[0][0]
 
