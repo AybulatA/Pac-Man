@@ -2,8 +2,8 @@ from PIL import Image
 import os
 
 
-ways = ['frightened(first)', 'frightened(second)', 'half_frightened(first)', 'half_frightened(second)']
-names = ['Ghost']
+ways = ['sound_on', 'sound_off']
+names = ['game']
 for name in names:
     for action in ways:
         na = action + '.png'
@@ -19,10 +19,10 @@ for name in names:
                 t = True
                 print(pixels[i, j])
                 r, g, b, p = pixels[i, j]
-                if r > 20 or b > 20 or g > 20:
+                if r < 200 or b < 200 or g < 200:
                     t = False
                 if t:
                     print('passed')
-                    pixels[i, j] = 0, 0, 0, 255
+                    pixels[i, j] = 255, 255, 255, 255
 
         im.save(n)

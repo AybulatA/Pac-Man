@@ -46,7 +46,7 @@ def draw_rect():
 
 if __name__ == '__main__':
     pygame.init()
-    size = 227, 160
+    size = 800, 800
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Pac-Man')
 
@@ -55,8 +55,10 @@ if __name__ == '__main__':
 
     clock = pygame.time.Clock()
     running = True
-    fon = load_image('field.jpg', colorkey=BLACK)
-    screen.fill((255, 255, 255))
+    fon = pygame.transform.scale(
+        load_image('sound_off.png', key_path='game', colorkey=WHITE),
+        (CELL_SIZE * 2, CELL_SIZE * 2))
+    screen.fill(BLACK)
     screen.blit(fon, (10, 10))
     while running:
         #draw_rect()

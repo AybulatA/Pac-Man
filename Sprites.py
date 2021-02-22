@@ -50,6 +50,14 @@ class Target(pygame.sprite.Sprite):
             CELL_SIZE * pos_x, CELL_SIZE * pos_y)
 
 
+class RegulateMusic(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, gr):
+        super().__init__(gr)
+        self.image = SPRITES['sound_on']
+        self.rect = self.image.get_rect().move(
+            CELL_SIZE * pos_x, CELL_SIZE * pos_y)
+
+
 class Stop(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, gr, gr2):
         super().__init__(gr, gr2)

@@ -16,20 +16,15 @@ class Ghost(pygame.sprite.Sprite):
             'status': True,
             'action': UP
         }
-        self.points_to_leave = 0      #ghosts can leave only with a certain number of points per round
+        self.points_to_leave = 0   #ghosts can leave only with a certain number of points per round
+        self.last_cell_action = [0, 0]
 
         self.name = name
         self.sprites = SPRITES[name]
         self.image = self.sprites[game_parameters['mod']][self.action][self.frame]
         self.mask = pygame.mask.from_surface(self.image)
-
-        self.last_cell_action = [0, 0]
-
-        self.target = Target(0, 0, all_sprites)
-
         self.rect = self.image.get_rect().move(CELL_SIZE * pos_x + CELL_SIZE // 4,
                                                CELL_SIZE * pos_y + CELL_SIZE // 4)
-
         self.real_rect_x = self.rect.x
         self.real_rect_y = self.rect.y
 
@@ -40,11 +35,11 @@ class Ghost(pygame.sprite.Sprite):
                 if self.points_to_leave - game_parameters['score per round'] > 0:
                     self.action = opposite_keys[self.action]
                 else:
-                    if pos[0] != 13:
+                    if pos[0] != 14:
                         self.action = self.newborn['action']
                     else:
                         self.action = UP
-
+                        self.action = UP
             if pos not in HOME_WITH_DOORS and cell_center(self)[-1] == MIDDLE:
                 self.newborn['status'] = False
                 self.action = LEFT
@@ -55,6 +50,9 @@ class Ghost(pygame.sprite.Sprite):
             if len(keys) == 1:
                 self.action = keys[0]
             else:
+                if position(self) in THRESHOLD and self.at_home and game_parameters['mod']\
+                        not in [FRIGHTENED, H_FRIGHTENED]:
+                    self.action = LEFT
                 if self.frightened and self.alive:
                     self.action = random(keys)
                 else:
@@ -80,9 +78,10 @@ class Ghost(pygame.sprite.Sprite):
             self.at_home = True
             self.action = opposite_keys[self.action]
             self.frightened = False
-        elif mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home \
-                and pos not in HOME_WITH_DOORS:  # when the ghost leaves the house, its mod can be chase or scatter
-            self.at_home = False
+            self.frame = 0
+        elif (mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home
+              and pos not in HOME_WITH_DOORS) or self.frightened:  # when the ghost leaves the house,
+            self.at_home = False                  # its mod can be chase or scatter
 
     def dead(self):
         self.alive = False
@@ -91,19 +90,18 @@ class Ghost(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
     def sprite_changes(self):
-        if self.at_home:
+        if self.at_home and self.frightened is False:
             mod = CHASE
         elif self.alive is True:
             mod = game_parameters['mod']
         else:
             mod = DEAD
 
-        if (mod != FRIGHTENED and mod != H_FRIGHTENED and
-                self.frightened is False or self.alive is False) or self.at_home:
-            path = self.sprites[mod][self.action]
+        path = self.sprites[mod]
+        try:
+            path = path[self.action]
             frame_speed = 0.2
-        else:
-            path = self.sprites[mod]
+        except IndexError:
             frame_speed = 0.1
 
         self.frame = (self.frame + frame_speed) % len(path)

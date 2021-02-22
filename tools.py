@@ -43,6 +43,13 @@ def load_sprites():
     SPRITES['Attempts'] = pygame.transform.flip(im, True, False)
 
     SPRITES['stop'] = load_image('stop.jpg', key_path='game', colorkey=WHITE)
+    SPRITES['sound_on'] = pygame.transform.scale(load_image('sound_on.png', key_path='game', colorkey=WHITE), (CELL_SIZE * 2, CELL_SIZE * 2))
+    SPRITES['sound_on'].set_colorkey(WHITE)
+
+    SPRITES['sound_off'] = pygame.transform.scale(load_image('sound_off.png',
+                                                             key_path='game', colorkey=WHITE),
+                                                  (CELL_SIZE * 2, CELL_SIZE * 2))
+    SPRITES['sound_off'].set_colorkey(WHITE)
 
 
 def load_level(filename):
@@ -218,13 +225,13 @@ def kill_attempt_and_reset_game():
 
 def change_way():
     for ghost in enemy_group:
-        if ghost.alive and ghost.at_home is False:
+        if ghost.alive and ghost.at_home is False and ghost.frightened is False:
             ghost.action = opposite_keys[ghost.action]
 
 
 def change_frightened(b):
     for i in enemy_group:
-        if i.at_home is False:
+        if i.newborn['status'] is False:
             i.frightened = b
 
 
@@ -232,9 +239,11 @@ def change_frightened(b):
 def stop_timer():
     game_parameters['stopped timer'] = pygame.time.get_ticks()
     time = time_in_frightened_mod()
+    pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, 0, True)
     pygame.time.set_timer(FRIGHTENED_EVENT_ID, int(time), True)
     if time > 0:
-        game_parameters['saved mod'] = game_parameters['mod']
+        if game_parameters['mod'] not in [FRIGHTENED, H_FRIGHTENED]:
+            game_parameters['saved mod'] = game_parameters['mod']
         game_parameters['mod'] = FRIGHTENED
         change_frightened(True)
 
@@ -268,3 +277,15 @@ def correct_move(obj, actions):
                 if center_y > MIDDLE > next_y:
                     move_y = MIDDLE - center_y
         return (move_x, move_y)
+
+
+def load_musics():
+    MUSIC['munch'] = load_music('munch.wav', key_path='Pac-Man')
+    MUSIC['death'] = load_music('death.wav', key_path='Pac-Man')
+    MUSIC['eat_ghost'] = load_music('eatghost.wav', key_path='Pac-Man')
+
+
+def pause_music():
+    for key, value in MUSIC.items():
+        value.stop()
+    pygame.mixer.music.pause()

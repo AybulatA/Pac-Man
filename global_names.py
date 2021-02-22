@@ -1,6 +1,5 @@
 import pygame
 
-
 #sptite groups
 all_sprites = pygame.sprite.Group()
 borders_group = pygame.sprite.Group()
@@ -17,6 +16,8 @@ stop_group = pygame.sprite.Group()
 #EATING_GHOST = pygame.mixer.Sound('data/Pac-Man/eating_ghost.wav')
 #INTERMISSION = pygame.mixer.Sound('data/Ghost/intermission.wav')
 #
+
+MUSIC = dict()
 
 game_obj = {
     'Pac-Man': None,
@@ -46,7 +47,8 @@ game_parameters = {
     'saved mod': None,
     'map': None,
     'score': 0,
-    'score per round': 0
+    'score per round': 0,
+    H_FRIGHTENED: False
 }
 
 SPRITES = dict()
@@ -55,7 +57,7 @@ SPRITES = dict()
 WIDTH, HEIGHT = 1000, 1000
 FPS = 60
 
-SPEED = 2.5
+SPEED = 3
 
 DEFAULT_EVENT_ID = pygame.USEREVENT + 1
 FRIGHTENED_EVENT_ID = pygame.USEREVENT + 2
@@ -115,6 +117,7 @@ TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
                 [23, 14], [24, 14], [27, 14], [26, 14], [25, 14]]
 
 BLOCK_CELLS = [[12, 11], [15, 11], [15, 23], [12, 23]]
+THRESHOLD = [[13, 11], [14, 11]]
 
 HOME_TAR = [13, 15]
 h = [[i, 13] for i in range(11, 17)]
@@ -139,5 +142,6 @@ LEVEL_TIME_CHANGE = {
 
 #colors
 BLACK = pygame.Color('black')
+BLUE = pygame.Color('blue')
 WHITE = pygame.Color('white')
 FOODS_COLOR = (235, 146, 52)
