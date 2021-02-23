@@ -9,6 +9,7 @@ player_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 attempts_group = pygame.sprite.Group()
 stop_group = pygame.sprite.Group()
+points_group = pygame.sprite.Group()
 
 #music
 #INTRO = pygame.mixer.Sound('data/game/intro.wav')
@@ -44,17 +45,19 @@ game_parameters = {
     'timer_num': 0,
     'ate ghosts': -1,
     'stopped timer': 0,
+    'mod changed time': 0,
     'saved mod': None,
     'map': None,
     'score': 0,
     'score per round': 0,
-    H_FRIGHTENED: False
+    H_FRIGHTENED: False,
+    'sound on': False
 }
 
 SPRITES = dict()
 
 #screen options
-WIDTH, HEIGHT = 1000, 1000
+WIDTH, HEIGHT = 990, 980
 FPS = 60
 
 SPEED = 3
@@ -62,6 +65,7 @@ SPEED = 3
 DEFAULT_EVENT_ID = pygame.USEREVENT + 1
 FRIGHTENED_EVENT_ID = pygame.USEREVENT + 2
 HALF_FRIGHTENED_EVENT_ID = pygame.USEREVENT + 3
+GAME_STARTING_EVENT_ID = pygame.USEREVENT + 4
 
 CHANGE_TO_EVENT_ID = {
     FRIGHTENED: FRIGHTENED_EVENT_ID,

@@ -1,6 +1,7 @@
 from global_names import *
 from tools import *
 import pygame
+from Sprites import Points
 
 
 class PacMan(pygame.sprite.Sprite):
@@ -25,7 +26,8 @@ class PacMan(pygame.sprite.Sprite):
         self.temporary_action = ((self.rect.x, self.rect.y), key)
 
     def dead(self):
-        MUSIC["death"].play()
+        if game_parameters['sound on']:
+            MUSIC["death"].play()
         self.alive = False
         for i in enemy_group:
             i.kill()
@@ -38,13 +40,16 @@ class PacMan(pygame.sprite.Sprite):
             enemy = enemy[0]
             x = abs(enemy.rect.x - self.rect.x)
             y = abs(enemy.rect.y - self.rect.y)
-            if (position(self) == position(enemy) or (x < 3 and y < 3)) and enemy.alive is True:
+            if (position(self) == position(enemy) or (x < 6 and y < 6)) and enemy.alive is True:
                 if enemy.frightened:
                     game_parameters['ate ghosts'] += 1
-                    game_parameters['mod'] = STOP
+                    sc = (2 ** game_parameters['ate ghosts']) * 200
+                    x1, y1 = position(self)
+                    Points(x1, y1, points_group, all_sprites)
+                    if game_parameters['sound on']:
+                        MUSIC['eat_ghost'].play()
+                    score += sc
                     enemy.dead()
-                    MUSIC['eat_ghost'].play()
-                    score += (2 ** game_parameters['ate ghosts']) * 200
                 else:
                     self.dead()
                     self.frame = 0
@@ -92,8 +97,9 @@ class PacMan(pygame.sprite.Sprite):
 
         if len(pygame.sprite.spritecollide(self, foods_group, True)) == 1:
             score += 10
-            MUSIC['munch'].stop()
-            MUSIC['munch'].play()
+            if game_parameters['sound on']:
+                MUSIC['munch'].stop()
+                MUSIC['munch'].play()
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
             score += 50
             change_way()

@@ -43,13 +43,23 @@ def load_sprites():
     SPRITES['Attempts'] = pygame.transform.flip(im, True, False)
 
     SPRITES['stop'] = load_image('stop.jpg', key_path='game', colorkey=WHITE)
-    SPRITES['sound_on'] = pygame.transform.scale(load_image('sound_on.png', key_path='game', colorkey=WHITE), (CELL_SIZE * 2, CELL_SIZE * 2))
+    SPRITES['sound_on'] = pygame.transform.scale(load_image('sound_on.png', key_path='game',
+                                                            colorkey=WHITE),
+                                                 (CELL_SIZE * 2, CELL_SIZE * 2))
     SPRITES['sound_on'].set_colorkey(WHITE)
 
     SPRITES['sound_off'] = pygame.transform.scale(load_image('sound_off.png',
                                                              key_path='game', colorkey=WHITE),
                                                   (CELL_SIZE * 2, CELL_SIZE * 2))
     SPRITES['sound_off'].set_colorkey(WHITE)
+
+    SPRITES['points'] = []
+    p = ['200', '400', '800', '1600']
+    for i in p:
+        im = pygame.transform.scale(load_image(i + '.png', key_path='Ghost'),
+                                    (int(CELL_SIZE * 1.5),
+                                     int(CELL_SIZE * 1.5)))
+        SPRITES['points'].append(im)
 
 
 def load_level(filename):
@@ -122,11 +132,6 @@ def load_and_resize_sprites(name):
                                   load_image('left(second).png', key_path=name)]
 
         sprites['scatter'] = sprites['chase'].copy()
-
-        sprites['points'] = []
-        p = ['200', '400', '800', '1600']
-        for i in p:
-            sprites['points'].append(load_image(i + '.png', key_path='Ghost'))
 
         sprites['dead'] = {
             UP: [load_image('dead(up).png', key_path='Ghost')],
@@ -202,13 +207,14 @@ def cell_center(obj):
 
 def kill_all_sprites():
     for obj in all_sprites:
-        obj.kill()
+        if obj != game_obj['RegulateMusic']:
+            obj.kill()
 
 
 def kill_attempt_and_reset_game():
     n = len(attempts_group)
     for i in all_sprites:
-        if i in player_group or i in enemy_group or n == 0:
+        if (i in player_group or i in enemy_group or n == 0) and i != game_obj['RegulateMusic']:
             i.kill()
     if n != 0:
         for i in attempts_group:
@@ -235,17 +241,32 @@ def change_frightened(b):
             i.frightened = b
 
 
-#in frightened mod timer stops
+#at frightened mod timer stops
 def stop_timer():
-    game_parameters['stopped timer'] = pygame.time.get_ticks()
+    game_parameters['stopped timer'] = mod_changed_time()
     time = time_in_frightened_mod()
+    game_parameters[H_FRIGHTENED] = False
     pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, 0, True)
+    pygame.time.set_timer(FRIGHTENED_EVENT_ID, 0, True)
     pygame.time.set_timer(FRIGHTENED_EVENT_ID, int(time), True)
     if time > 0:
         if game_parameters['mod'] not in [FRIGHTENED, H_FRIGHTENED]:
             game_parameters['saved mod'] = game_parameters['mod']
         game_parameters['mod'] = FRIGHTENED
         change_frightened(True)
+
+
+def mod_changed_time():
+    for i in LEVEL_TIME_CHANGE:
+        if str(game_parameters['level']) in i.split(' '):
+            break
+    if game_parameters['mod'] not in [FRIGHTENED, H_FRIGHTENED]:
+        time = int(LEVEL_TIME_CHANGE[i][game_parameters['timer_num'] - 1] -
+                   (pygame.time.get_ticks() - game_parameters['mod changed time']) / 1000) * 1000
+    else:
+        time = game_parameters['mod changed time']
+    print('Chaned time:', time)
+    return time
 
 
 def time_in_frightened_mod():

@@ -82,11 +82,12 @@ class Ghost(pygame.sprite.Sprite):
         elif (mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home
               and pos not in HOME_WITH_DOORS) or self.frightened:  # when the ghost leaves the house,
             self.at_home = False                  # its mod can be chase or scatter
+            for i in points_group:
+                i.kill()
 
     def dead(self):
         self.alive = False
         self.frame = 0
-        self.image = self.sprites['points'][game_parameters['ate ghosts']]
         self.mask = pygame.mask.from_surface(self.image)
 
     def sprite_changes(self):
@@ -143,7 +144,10 @@ class Ghost(pygame.sprite.Sprite):
     def choose_path(self):
         target = [(game_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,
                   (game_obj['Pac-Man'].rect.y + CELL_SIZE // 2) // CELL_SIZE]
-        return self.new_target(target)
+        try:
+            return self.new_target(target)
+        except KeyError:
+            return target
 
     def new_target(self, target):
         return target

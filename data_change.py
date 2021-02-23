@@ -19,7 +19,7 @@ for name in names:
                 t = True
                 print(pixels[i, j])
                 r, g, b, p = pixels[i, j]
-                if r < 200 or b < 200 or g < 200:
+                if r > 50 or b > 50 or g > 50:
                     t = False
                 if t:
                     print('passed')

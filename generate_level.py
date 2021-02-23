@@ -25,6 +25,4 @@ def generate_level(level, new_game=True):
     Inky(11, 14, enemy_group, all_sprites)
     Clyde(15, 14, enemy_group, all_sprites)
 
-    RegulateMusic(29, 29, all_sprites)
-
 

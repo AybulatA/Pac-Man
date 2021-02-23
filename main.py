@@ -2,29 +2,35 @@ import pygame
 from global_names import *
 from tools import *
 from generate_level import generate_level
-from Sprites import Stop
+from Sprites import Stop, RegulateMusic
 
 
 def events(intro=False):
     global running
+    global intro_screen
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONUP:
+            x, y = event.pos
+            if 31 * CELL_SIZE > x > 29 * CELL_SIZE and 31 * CELL_SIZE > y > 29 * CELL_SIZE:
+                game_obj['RegulateMusic'].change_sound_mode()
+        elif event.type == GAME_STARTING_EVENT_ID:
+            intro_screen = False
         elif event.type == pygame.KEYUP:
             key = event.key
             if key == pygame.K_ESCAPE:
                 if game_obj['Stop'] is None:
                     game_obj['Stop'] = Stop(10, 11, stop_group, all_sprites)
-                    game_parameters['stopped timer'] = pygame.time.get_ticks()
+                    game_parameters['stopped timer'] = mod_changed_time()
                     pause_music()
                 else:
                     for i in stop_group:
                         i.kill()
                     game_obj['Stop'] = None
                     pygame.mixer.music.unpause()
-                    if intro:
-                        timer(game_parameters['stopped timer'],
-                              event_id=CHANGE_TO_EVENT_ID[game_parameters['mod']])
+                    timer(game_parameters['stopped timer'],
+                          event_id=CHANGE_TO_EVENT_ID[game_parameters['mod']])
             elif key in [UP, DOWN, LEFT, RIGHT] and intro is False:
                 game_obj['Pac-Man'].key_pressed(key)
         if game_obj['Stop'] is None and intro is False:
@@ -45,7 +51,7 @@ def events(intro=False):
                 game_parameters['mod'] = game_parameters['saved mod']
                 game_parameters['ate ghosts'] = -1
                 change_frightened(False)
-                timer(pygame.time.get_ticks() - game_parameters['stopped timer'])
+                timer(game_parameters['stopped timer'])
 
 
 def change_mod():
@@ -79,6 +85,7 @@ def timer(time=None, event_id=None):
     if time is None:
         time = int(LEVEL_TIME_CHANGE['infinity'][game_parameters['timer_num']] * 1000)
     pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
+    game_parameters['mod changed time'] = pygame.time.get_ticks()
     game_parameters['timer_num'] += 1
 
 
@@ -99,6 +106,7 @@ def check_game_status():
         game_parameters['mod'] = SCATTER
         game_parameters['timer_num'] = 0
         game_parameters['score per round'] = 0
+        game_parameters['mod changed time'] = 0
         change_frightened(False)
 
         if mod == GAME_OVER:
@@ -106,6 +114,8 @@ def check_game_status():
             game_parameters['saved mod'] = None
             game_parameters['ate ghosts'] = -1
             game_parameters['stopped timer'] = 0
+        elif mod == ROUND_OVER:
+            kill_all_sprites()
 
         #reset timers
         pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
@@ -116,11 +126,8 @@ def check_game_status():
         generate_level(game_parameters['map'], new_game=param)
         if GAME_OVER == mod:
             start_screen()
-        start_background_music()
+            start_background_music()
         timer()
-    elif mod == STOP:
-        pygame.time.wait(500)
-        game_parameters['mod'] = H_FRIGHTENED if game_parameters['mod'] else FRIGHTENED
 
 
 def score_update():
@@ -128,17 +135,23 @@ def score_update():
 
 
 def start_screen():
+    global intro_screen
     pygame.mixer.music.load(os.path.join('data/game/music', 'intro.wav'))
     pygame.mixer.music.play()
+    if game_parameters['sound on'] is False:
+        pygame.mixer.music.pause()
     im = pygame.transform.scale(load_image('ready!.jpg', key_path='game'),
                                 (CELL_SIZE * 7, CELL_SIZE * 1))
     all_sprites.update()
     all_sprites.draw(screen)
     pygame.display.flip()
-    while pygame.mixer.music.get_busy():
+    pygame.time.set_timer(GAME_STARTING_EVENT_ID, 4200, True)
+    intro_screen = True
+    while intro_screen:
         events(True)
         screen.fill(BLACK)
         screen.blit(im, (11 * CELL_SIZE, 17 * CELL_SIZE))
+        game_obj['RegulateMusic'].update()
         all_sprites.draw(screen)
         pygame.display.flip()
 
@@ -151,6 +164,8 @@ def check_music():
 def start_background_music():
     pygame.mixer.music.load(os.path.join('data/game/music', 'fon.mp3'))
     pygame.mixer.music.play()
+    if game_parameters['sound on'] is False or game_obj['Stop'] is not None:
+        pygame.mixer.music.pause()
 
 
 def draw_border():
@@ -162,6 +177,7 @@ if __name__ == '__main__':
     size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Pac-Man')
+    pygame.display.set_icon(load_image('pacman.ico', key_path='game'))
 
     font = pygame.font.SysFont("Comic Sans MS", 32)
     font_score = pygame.font.SysFont("PerfectDOSVGA437", 62)
@@ -171,6 +187,7 @@ if __name__ == '__main__':
     load_sprites()
     load_musics()
     game_parameters['map'] = load_level('map.txt')
+    game_obj['RegulateMusic'] = RegulateMusic(29, 29, all_sprites)
     generate_level(game_parameters['map'])
     start_screen()
     timer()

@@ -56,6 +56,27 @@ class RegulateMusic(pygame.sprite.Sprite):
         self.image = SPRITES['sound_on']
         self.rect = self.image.get_rect().move(
             CELL_SIZE * pos_x, CELL_SIZE * pos_y)
+        self.change_sound_mode()
+
+    def change_sound_mode(self):
+        if game_parameters['sound on']:
+            game_parameters['sound on'] = False
+            self.image = SPRITES['sound_off']
+            pygame.mixer.music.pause()
+            for i in MUSIC:
+                MUSIC[i].stop()
+        else:
+            game_parameters['sound on'] = True
+            self.image = SPRITES['sound_on']
+            pygame.mixer.music.unpause()
+
+
+class Points(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, gr1, gr2):
+        super().__init__(gr1, gr2)
+        self.image = SPRITES['points'][game_parameters['ate ghosts']]
+        self.rect = self.image.get_rect().move(
+            CELL_SIZE * pos_x, CELL_SIZE * pos_y)
 
 
 class Stop(pygame.sprite.Sprite):
@@ -74,3 +95,4 @@ class Attempts(pygame.sprite.Sprite):
                                                                   int(CELL_SIZE)))
         self.rect = self.image.get_rect().move(
             CELL_SIZE // 4 + CELL_SIZE * pos_x, CELL_SIZE // 4 + CELL_SIZE * pos_y)
+
