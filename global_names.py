@@ -11,13 +11,6 @@ attempts_group = pygame.sprite.Group()
 stop_group = pygame.sprite.Group()
 points_group = pygame.sprite.Group()
 
-#music
-#INTRO = pygame.mixer.Sound('data/game/intro.wav')
-
-#EATING_GHOST = pygame.mixer.Sound('data/Pac-Man/eating_ghost.wav')
-#INTERMISSION = pygame.mixer.Sound('data/Ghost/intermission.wav')
-#
-
 MUSIC = dict()
 
 game_obj = {
@@ -38,13 +31,18 @@ ATTEMPT = 'attempt'
 STOP = 'stop'
 DEAD = 'dead'
 
+LEVEL_TIME_CHANGE = {
+    '1': [7, 20, 7, 20, 5, 20, 5],
+    '2 3 4 5': [7, 20, 7, 20, 5, 1033, 1 / 60],
+    'infinity': [5, 20, 5, 20, 5, 1037, 1 / 60]
+}
 
 game_parameters = {
     'mod': SCATTER,
     'level': 1,
     'timer_num': 0,
     'ate ghosts': -1,
-    'stopped timer': 0,
+    'stopped timer': LEVEL_TIME_CHANGE['1'][0] * 1000,
     'mod changed time': 0,
     'saved mod': None,
     'map': None,
@@ -136,12 +134,6 @@ target_in_scatter_mod = {
     'Pinky': (2, -3),
     'Inky': (27, 34),
     'Clyde': (0, 34)
-}
-
-LEVEL_TIME_CHANGE = {
-    '1': [7, 20, 7, 20, 5, 20, 5],
-    '2 3 4 5': [7, 20, 7, 20, 5, 1033, 1 / 60],
-    'infinity': [5, 20, 5, 20, 5, 1037, 1 / 60]
 }
 
 #colors

@@ -40,7 +40,7 @@ class PacMan(pygame.sprite.Sprite):
             enemy = enemy[0]
             x = abs(enemy.rect.x - self.rect.x)
             y = abs(enemy.rect.y - self.rect.y)
-            if (position(self) == position(enemy) or (x < 6 and y < 6)) and enemy.alive is True:
+            if (position(self) == position(enemy) or (x < 15 and y < 15)) and enemy.alive is True:
                 if enemy.frightened:
                     game_parameters['ate ghosts'] += 1
                     sc = (2 ** game_parameters['ate ghosts']) * 200
@@ -104,5 +104,6 @@ class PacMan(pygame.sprite.Sprite):
             score += 50
             change_way()
             stop_timer()
+            game_parameters['ate ghosts'] = -1
         game_parameters['score per round'] += score
         game_parameters['score'] += score

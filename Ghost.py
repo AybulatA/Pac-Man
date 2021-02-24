@@ -1,6 +1,5 @@
 from global_names import *
 from tools import *
-from Sprites import Target
 
 
 class Ghost(pygame.sprite.Sprite):
@@ -79,11 +78,12 @@ class Ghost(pygame.sprite.Sprite):
             self.action = opposite_keys[self.action]
             self.frightened = False
             self.frame = 0
-        elif (mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home
-              and pos not in HOME_WITH_DOORS) or self.frightened:  # when the ghost leaves the house,
-            self.at_home = False                  # its mod can be chase or scatter
             for i in points_group:
                 i.kill()
+                break
+        elif (mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home
+              and pos not in HOME_WITH_DOORS) or self.frightened: # when the ghost leaves the house,
+            self.at_home = False                  # its mod can be chase or scatter
 
     def dead(self):
         self.alive = False
@@ -128,7 +128,7 @@ class Ghost(pygame.sprite.Sprite):
         elif position(self) in TUNNEL_CELLS:
             speed = MODS_SPEED['tunnel']
         elif mod == CHASE or mod == SCATTER:
-            speed = self.default_speed()
+            speed = MODS_SPEED[CHASE]
         else:
             speed = 3
         return {
@@ -137,9 +137,6 @@ class Ghost(pygame.sprite.Sprite):
             DOWN: [speed, 0],
             UP: [-speed, 0],
         }
-
-    def default_speed(self):
-        return MODS_SPEED[CHASE]
 
     def choose_path(self):
         target = [(game_obj['Pac-Man'].rect.x + CELL_SIZE // 2) // CELL_SIZE,

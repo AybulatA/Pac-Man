@@ -1,4 +1,3 @@
-from tools import load_image
 from global_names import *
 
 
@@ -39,15 +38,6 @@ class Energizer(pygame.sprite.Sprite):
     def update(self):
         self.frame = (self.frame + 0.1) % len(self.sprites)
         self.image = self.sprites[int(self.frame)]
-
-
-class Target(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, gr):
-        super().__init__(gr)
-        self.image = pygame.transform.scale(load_image('cross.jpg'), (int(CELL_SIZE),
-                                                                      int(CELL_SIZE)))
-        self.rect = self.image.get_rect().move(
-            CELL_SIZE * pos_x, CELL_SIZE * pos_y)
 
 
 class RegulateMusic(pygame.sprite.Sprite):
@@ -96,3 +86,10 @@ class Attempts(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(
             CELL_SIZE // 4 + CELL_SIZE * pos_x, CELL_SIZE // 4 + CELL_SIZE * pos_y)
 
+
+class Reset(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, gr):
+        super().__init__(gr)
+        self.image = SPRITES['reset']
+        self.rect = self.image.get_rect().move(
+            CELL_SIZE // 4 + CELL_SIZE * pos_x, CELL_SIZE // 4 + CELL_SIZE * pos_y)

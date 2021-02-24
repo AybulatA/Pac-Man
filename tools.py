@@ -43,15 +43,19 @@ def load_sprites():
     SPRITES['Attempts'] = pygame.transform.flip(im, True, False)
 
     SPRITES['stop'] = load_image('stop.jpg', key_path='game', colorkey=WHITE)
-    SPRITES['sound_on'] = pygame.transform.scale(load_image('sound_on.png', key_path='game',
-                                                            colorkey=WHITE),
+    SPRITES['sound_on'] = pygame.transform.scale(load_image('sound_on.png', key_path='game'),
                                                  (CELL_SIZE * 2, CELL_SIZE * 2))
     SPRITES['sound_on'].set_colorkey(WHITE)
 
     SPRITES['sound_off'] = pygame.transform.scale(load_image('sound_off.png',
-                                                             key_path='game', colorkey=WHITE),
+                                                             key_path='game'),
                                                   (CELL_SIZE * 2, CELL_SIZE * 2))
     SPRITES['sound_off'].set_colorkey(WHITE)
+
+    SPRITES['reset'] = pygame.transform.scale(load_image('reset.png',
+                                                         key_path='game'),
+                                              (CELL_SIZE * 2, CELL_SIZE * 2))
+    SPRITES['reset'].set_colorkey(WHITE)
 
     SPRITES['points'] = []
     p = ['200', '400', '800', '1600']
@@ -59,6 +63,7 @@ def load_sprites():
         im = pygame.transform.scale(load_image(i + '.png', key_path='Ghost'),
                                     (int(CELL_SIZE * 1.5),
                                      int(CELL_SIZE * 1.5)))
+        im.set_colorkey(BLACK)
         SPRITES['points'].append(im)
 
 
@@ -207,26 +212,28 @@ def cell_center(obj):
 
 def kill_all_sprites():
     for obj in all_sprites:
-        if obj != game_obj['RegulateMusic']:
+        if obj not in [game_obj['RegulateMusic'], game_obj['Reset'], game_obj['Stop']]:
             obj.kill()
 
 
 def kill_attempt_and_reset_game():
     n = len(attempts_group)
-    for i in all_sprites:
-        if (i in player_group or i in enemy_group or n == 0) and i != game_obj['RegulateMusic']:
-            i.kill()
-    if n != 0:
-        for i in attempts_group:
-            if n == 1:
-                i.kill()
-            n -= 1
-        game_parameters['mod'] = ATTEMPT
-    else:
+    if n == 0:
         game_parameters['score'] = 0
         game_parameters['level'] = 1
-
         game_parameters['mod'] = GAME_OVER
+        kill_all_sprites()
+        return None
+    for i in all_sprites:
+        if (i in player_group or i in enemy_group or i in points_group)\
+                and i != game_obj['RegulateMusic']:
+            i.kill()
+    for i in attempts_group:
+        if n == 1:
+            i.kill()
+        n -= 1
+    game_parameters['mod'] = ATTEMPT
+
 
 
 def change_way():
@@ -241,9 +248,9 @@ def change_frightened(b):
             i.frightened = b
 
 
-#at frightened mod timer stops
+# at frightened mod timer stops
 def stop_timer():
-    game_parameters['stopped timer'] = mod_changed_time()
+    game_parameters['stopped timer'] = how_many_time_else()
     time = time_in_frightened_mod()
     game_parameters[H_FRIGHTENED] = False
     pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, 0, True)
@@ -256,7 +263,7 @@ def stop_timer():
         change_frightened(True)
 
 
-def mod_changed_time():
+def how_many_time_else():
     for i in LEVEL_TIME_CHANGE:
         if str(game_parameters['level']) in i.split(' '):
             break
@@ -264,7 +271,7 @@ def mod_changed_time():
         time = int(LEVEL_TIME_CHANGE[i][game_parameters['timer_num'] - 1] -
                    (pygame.time.get_ticks() - game_parameters['mod changed time']) / 1000) * 1000
     else:
-        time = game_parameters['mod changed time']
+        time = game_parameters['stopped timer']
     print('Chaned time:', time)
     return time
 
@@ -275,29 +282,29 @@ def time_in_frightened_mod():
 
 # adjusts speed to get to the center of the cell
 def correct_move(obj, actions):
-        center_x, center_y = cell_center(obj)
+    center_x, center_y = cell_center(obj)
 
-        move_x = actions[obj.action][1]
-        move_y = actions[obj.action][0]
+    move_x = actions[obj.action][1]
+    move_y = actions[obj.action][0]
 
-        next_x = (center_x + move_x) % CELL_SIZE
-        next_y = (center_y + move_y) % CELL_SIZE
+    next_x = (center_x + move_x) % CELL_SIZE
+    next_y = (center_y + move_y) % CELL_SIZE
 
-        if obj.action in VERTICAL:
-            if obj.action == RIGHT:
-                if center_x < MIDDLE < next_x:
-                    move_x = MIDDLE - center_x
-            else:
-                if center_x > MIDDLE > next_x:
-                    move_x = MIDDLE - center_x
+    if obj.action in VERTICAL:
+        if obj.action == RIGHT:
+            if center_x < MIDDLE < next_x:
+                move_x = MIDDLE - center_x
         else:
-            if obj.action == DOWN:
-                if center_y < MIDDLE < next_y:
-                    move_y = MIDDLE - center_y
-            else:
-                if center_y > MIDDLE > next_y:
-                    move_y = MIDDLE - center_y
-        return (move_x, move_y)
+            if center_x > MIDDLE > next_x:
+                move_x = MIDDLE - center_x
+    else:
+        if obj.action == DOWN:
+            if center_y < MIDDLE < next_y:
+                move_y = MIDDLE - center_y
+        else:
+            if center_y > MIDDLE > next_y:
+                move_y = MIDDLE - center_y
+    return move_x, move_y
 
 
 def load_musics():
@@ -310,3 +317,11 @@ def pause_music():
     for key, value in MUSIC.items():
         value.stop()
     pygame.mixer.music.pause()
+
+
+def change_mod():
+    if game_parameters['timer_num'] % 2 == 0:
+        game_parameters['mod'] = SCATTER
+    else:
+        game_parameters['mod'] = CHASE
+    change_way()

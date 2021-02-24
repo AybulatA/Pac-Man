@@ -24,5 +24,3 @@ def generate_level(level, new_game=True):
     Pinky(13, 14, enemy_group, all_sprites)
     Inky(11, 14, enemy_group, all_sprites)
     Clyde(15, 14, enemy_group, all_sprites)
-
-
