@@ -26,7 +26,6 @@ class Energizer(pygame.sprite.Sprite):
         first = pygame.Surface([CELL_SIZE, CELL_SIZE])
         pygame.draw.circle(first, FOODS_COLOR, (CELL_SIZE // 2,
                            CELL_SIZE // 2), CELL_SIZE // 2)
-
         second = pygame.Surface([CELL_SIZE, CELL_SIZE])
 
         self.frame = 0

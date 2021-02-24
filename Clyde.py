@@ -14,5 +14,3 @@ class Clyde(Ghost):
         if (abs(pos[0] - target[0]) ** 2 + abs(pos[1] - target[1]) ** 2) ** 0.5 < 8:
             target = target_in_scatter_mod['Clyde']
         return target
-
-

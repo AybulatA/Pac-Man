@@ -17,5 +17,3 @@ class Blinky(Ghost):
                                                CELL_SIZE * pos_y - CELL_SIZE // 4)
         self.real_rect_x = self.rect.x
         self.real_rect_y = self.rect.y
-
-

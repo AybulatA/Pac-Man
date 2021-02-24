@@ -1,6 +1,6 @@
 import pygame
 
-#sptite groups
+# sptite groups
 all_sprites = pygame.sprite.Group()
 borders_group = pygame.sprite.Group()
 foods_group = pygame.sprite.Group()
@@ -20,7 +20,7 @@ game_obj = {
     'Stop': None
 }
 
-#game mods
+# game mods
 FRIGHTENED = 'frightened'
 H_FRIGHTENED = 'half_frightened'
 CHASE = 'chase'
@@ -54,7 +54,7 @@ game_parameters = {
 
 SPRITES = dict()
 
-#screen options
+# screen options
 WIDTH, HEIGHT = 990, 980
 FPS = 60
 
@@ -74,21 +74,16 @@ CHANGE_TO_EVENT_ID = {
 
 CELL_SIZE = 30
 
-#sprite middle
+# sprite middle
 MIDDLE = CELL_SIZE * 1.5 / 2
 
-#field size, for tunnel
+# field size, for tunnel
 LEN_X = CELL_SIZE * 27
 
 RIGHT = pygame.K_RIGHT
 LEFT = pygame.K_LEFT
 DOWN = pygame.K_DOWN
 UP = pygame.K_UP
-
-print('up', UP)
-print('DOWN', DOWN)
-print('LEFT', LEFT)
-print('RIGHT', RIGHT)
 
 VERTICAL = [RIGHT, LEFT]
 HORIZONTAL = [DOWN, UP]
@@ -121,11 +116,11 @@ TUNNEL_CELLS = [[0, 14], [1, 14], [2, 14], [3, 14], [4, 14],
 BLOCK_CELLS = [[12, 11], [15, 11], [15, 23], [12, 23]]
 THRESHOLD = [[13, 11], [14, 11]]
 
-HOME_TAR = [13, 15]
+HOME_TAR = [13, 15]  # home target
 h = [[i, 13] for i in range(11, 17)]
 h.extend([[i, 14] for i in range(11, 17)])
 h.extend([[i, 15] for i in range(11, 17)])
-HOME = h.copy()
+HOME = h.copy()  # home coordinates
 h.extend([[13, 12], [14, 12]])
 HOME_WITH_DOORS = h.copy()
 
@@ -136,7 +131,7 @@ target_in_scatter_mod = {
     'Clyde': (0, 34)
 }
 
-#colors
+# colors
 BLACK = pygame.Color('black')
 BLUE = pygame.Color('blue')
 WHITE = pygame.Color('white')

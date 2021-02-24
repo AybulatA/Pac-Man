@@ -15,7 +15,7 @@ class Ghost(pygame.sprite.Sprite):
             'status': True,
             'action': UP
         }
-        self.points_to_leave = 0   #ghosts can leave only with a certain number of points per round
+        self.points_to_leave = 0  # ghosts can leave only with a certain number of points per round
         self.last_cell_action = [0, 0]
 
         self.name = name
@@ -29,19 +29,7 @@ class Ghost(pygame.sprite.Sprite):
 
     def update(self):
         if self.newborn['status']:
-            pos = position(self)
-            if pygame.sprite.collide_mask(self, game_obj['Border']):
-                if self.points_to_leave - game_parameters['score per round'] > 0:
-                    self.action = opposite_keys[self.action]
-                else:
-                    if pos[0] != 14:
-                        self.action = self.newborn['action']
-                    else:
-                        self.action = UP
-                        self.action = UP
-            if pos not in HOME_WITH_DOORS and cell_center(self)[-1] == MIDDLE:
-                self.newborn['status'] = False
-                self.action = LEFT
+            self.newborn_behavior()
         else:
             self.is_ghost_at_home()
             keys = self.find_action()
@@ -49,7 +37,7 @@ class Ghost(pygame.sprite.Sprite):
             if len(keys) == 1:
                 self.action = keys[0]
             else:
-                if position(self) in THRESHOLD and self.at_home and game_parameters['mod']\
+                if position(self) in THRESHOLD and self.at_home and game_parameters['mod'] \
                         not in [FRIGHTENED, H_FRIGHTENED]:
                     self.action = LEFT
                 if self.frightened and self.alive:
@@ -57,8 +45,21 @@ class Ghost(pygame.sprite.Sprite):
                 else:
                     self.action = self.targeting(self.choose_target(), keys)
 
-        if game_parameters['mod'] != STOP:
-            self.sprite_changes()
+        self.sprite_changes()
+
+    def newborn_behavior(self):
+        pos = position(self)
+        if pygame.sprite.collide_mask(self, game_obj['Border']):
+            if self.points_to_leave - game_parameters['score per round'] > 0:
+                self.action = opposite_keys[self.action]
+            else:
+                if pos[0] != 14:
+                    self.action = self.newborn['action']
+                else:
+                    self.action = UP
+        if pos not in HOME_WITH_DOORS and cell_center(self)[-1] == MIDDLE:
+            self.newborn['status'] = False
+            self.action = LEFT
 
     def choose_target(self):
         if self.at_home:
@@ -82,13 +83,12 @@ class Ghost(pygame.sprite.Sprite):
                 i.kill()
                 break
         elif (mod != FRIGHTENED and mod != H_FRIGHTENED and self.at_home
-              and pos not in HOME_WITH_DOORS) or self.frightened: # when the ghost leaves the house,
-            self.at_home = False                  # its mod can be chase or scatter
+              and pos not in HOME_WITH_DOORS) or self.frightened:  # when the ghost leaves the house,
+            self.at_home = False  # its mod can be chase or scatter
 
     def dead(self):
         self.alive = False
         self.frame = 0
-        self.mask = pygame.mask.from_surface(self.image)
 
     def sprite_changes(self):
         if self.at_home and self.frightened is False:
@@ -123,11 +123,11 @@ class Ghost(pygame.sprite.Sprite):
             mod = CHASE
         if self.alive is False:
             speed = MODS_SPEED[DEAD]
-        elif mod == FRIGHTENED or mod == H_FRIGHTENED:
+        elif mod in [FRIGHTENED, H_FRIGHTENED]:
             speed = MODS_SPEED[FRIGHTENED]
         elif position(self) in TUNNEL_CELLS:
             speed = MODS_SPEED['tunnel']
-        elif mod == CHASE or mod == SCATTER:
+        elif mod in [CHASE, SCATTER]:
             speed = MODS_SPEED[CHASE]
         else:
             speed = 3
@@ -146,6 +146,7 @@ class Ghost(pygame.sprite.Sprite):
         except KeyError:
             return target
 
+    # each ghost has its own target cell
     def new_target(self, target):
         return target
 
@@ -158,11 +159,11 @@ class Ghost(pygame.sprite.Sprite):
         if len(keys) == 1:
             return keys
 
-        #ghosts can't turn around
+        # ghosts can't turn around
         if opposite_keys[self.action] in keys:
             keys.remove(opposite_keys[self.action])
 
-        #ghosts on these cells cannot turn up instead of frightened mod
+        # ghosts on these cells cannot turn up instead of frightened mod
         if position(self) in BLOCK_CELLS and self.frightened is False:
             if UP in keys:
                 keys.remove(UP)
@@ -179,7 +180,7 @@ class Ghost(pygame.sprite.Sprite):
             else:
                 x = pos[0]
                 y = (-1) ** HORIZONTAL.index(i) + pos[1]
-            #distance from the center of the next turn to the target
+            # distance from the center of the next turn to the target
             first = abs(target[0] * CELL_SIZE - x * CELL_SIZE)
             second = abs(target[1] * CELL_SIZE - y * CELL_SIZE)
             line = (first ** 2 + second ** 2) ** 0.5
@@ -187,8 +188,7 @@ class Ghost(pygame.sprite.Sprite):
 
         ans = sorted(ans, key=lambda z: z[-1])
         if ans[0][-1] == ans[-1][-1] and len(ans) != 1:
-            #if all ways have the same length, the way will be chosen by priority
+            # if all ways have the same length, the way will be chosen by priority
             priority = [UP, LEFT, DOWN]
             ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
         return ans[0][0]
-

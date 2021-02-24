@@ -37,27 +37,25 @@ def load_sprites():
     names = ['Blinky', 'Pinky', 'Clyde', 'Inky', 'Pac-Man']
     for name in names:
         SPRITES[name] = load_and_resize_sprites(name)
-    SPRITES['Border'] = load_image('field.jpg', colorkey=BLACK)
 
     im = load_image('right(first).png', key_path='Pac-Man')
     SPRITES['Attempts'] = pygame.transform.flip(im, True, False)
 
-    SPRITES['stop'] = load_image('stop.jpg', key_path='game', colorkey=WHITE)
-    SPRITES['sound_on'] = pygame.transform.scale(load_image('sound_on.png', key_path='game'),
-                                                 (CELL_SIZE * 2, CELL_SIZE * 2))
-    SPRITES['sound_on'].set_colorkey(WHITE)
+    params = [('Border.jpg', BLACK), ('stop.jpg', WHITE), ('sound_on.png', WHITE),
+              ('sound_off.png', WHITE), ('reset.png', WHITE)]
+    for name, colorkey in params:
+        n = name.split('.')[0]
+        if n == 'Border':
+            SPRITES[n] = load_image(name, key_path='game')
+        else:
+            SPRITES[n] = pygame.transform.scale(load_image(name, key_path='game'),
+                                                (CELL_SIZE * 2, CELL_SIZE * 2))
+        SPRITES[n].set_colorkey(colorkey)
 
-    SPRITES['sound_off'] = pygame.transform.scale(load_image('sound_off.png',
-                                                             key_path='game'),
-                                                  (CELL_SIZE * 2, CELL_SIZE * 2))
-    SPRITES['sound_off'].set_colorkey(WHITE)
+    SPRITES['ready!'] = pygame.transform.scale(load_image('ready!.jpg', key_path='game'),
+                                               (CELL_SIZE * 7, CELL_SIZE * 1))
 
-    SPRITES['reset'] = pygame.transform.scale(load_image('reset.png',
-                                                         key_path='game'),
-                                              (CELL_SIZE * 2, CELL_SIZE * 2))
-    SPRITES['reset'].set_colorkey(WHITE)
-
-    SPRITES['points'] = []
+    SPRITES['points'] = list()
     p = ['200', '400', '800', '1600']
     for i in p:
         im = pygame.transform.scale(load_image(i + '.png', key_path='Ghost'),
@@ -83,12 +81,9 @@ def load_pacman_sprites(sprites):
                    'dead': [],
                    'start_image': [load_image('start.png', key_path='Pac-Man')]
                    }
-
-    sprites_pac['alive'][UP].extend(sprites_pac['start_image'])
-    sprites_pac['alive'][RIGHT].extend(sprites_pac['start_image'])
-
-    sprites_pac['alive'][UP].reverse()
-    sprites_pac['alive'][RIGHT].reverse()
+    for key in [UP, RIGHT]:
+        sprites_pac['alive'][key].extend(sprites_pac['start_image'])
+        sprites_pac['alive'][key].reverse()
 
     for sprite in sprites_pac['alive'][UP]:
         sprites_pac['alive'][DOWN].append(pygame.transform.flip(sprite, False, True))
@@ -121,21 +116,22 @@ def load_and_resize_sprites(name):
     if name == 'Pac-Man':
         sprites = load_pacman_sprites(sprites)
     else:
-        f = [load_image('frightened(first).png', key_path='Ghost'),
-             load_image('frightened(second).png', key_path='Ghost')]
-        sprites['frightened'] = f.copy()
+        ghost = 'Ghost'
+        sprites['frightened'] = list()
+        sprites['half_frightened'] = list()
+        params = ['frightened(first).png', 'frightened(second).png',
+                  'half_frightened(first).png', 'half_frightened(second).png']
+        for nam in params:
+            im = load_image(nam, key_path=ghost)
+            sprites['half_frightened'].append(im)
+            if nam[0] != 'h':
+                sprites['frightened'].append(im)
 
-        f.append(load_image('half_frightened(first).png', key_path='Ghost'))
-        f.append(load_image('half_frightened(second).png', key_path='Ghost'))
-
-        sprites['half_frightened'] = f.copy()
-
-        sprites['chase'][DOWN] = [load_image('down(first).png', key_path=name),
-                                  load_image('down(second).png', key_path=name)]
-
-        sprites['chase'][LEFT] = [load_image('left(first).png', key_path=name),
-                                  load_image('left(second).png', key_path=name)]
-
+        params = [[DOWN, ['down(first).png', 'down(second).png']],
+                  [LEFT, ['left(first).png', 'left(second).png']]]
+        for key, names in params:
+            sprites['chase'][key] = [load_image(names[0], key_path=name),
+                                     load_image(names[1], key_path=name)]
         sprites['scatter'] = sprites['chase'].copy()
 
         sprites['dead'] = {
@@ -205,11 +201,6 @@ def position(obj):
             int((obj.rect.y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) / CELL_SIZE)]
 
 
-def cell_center(obj):
-    return ((obj.real_rect_x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE,
-            (obj.real_rect_y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE)
-
-
 def kill_all_sprites():
     for obj in all_sprites:
         if obj not in [game_obj['RegulateMusic'], game_obj['Reset'], game_obj['Stop']]:
@@ -225,7 +216,7 @@ def kill_attempt_and_reset_game():
         kill_all_sprites()
         return None
     for i in all_sprites:
-        if (i in player_group or i in enemy_group or i in points_group)\
+        if (i in player_group or i in enemy_group or i in points_group) \
                 and i != game_obj['RegulateMusic']:
             i.kill()
     for i in attempts_group:
@@ -235,17 +226,21 @@ def kill_attempt_and_reset_game():
     game_parameters['mod'] = ATTEMPT
 
 
-
 def change_way():
     for ghost in enemy_group:
         if ghost.alive and ghost.at_home is False and ghost.frightened is False:
             ghost.action = opposite_keys[ghost.action]
 
 
-def change_frightened(b):
-    for i in enemy_group:
-        if i.newborn['status'] is False:
-            i.frightened = b
+def change_frightened(status):
+    for obj in enemy_group:
+        if obj.newborn['status'] is False:
+            obj.frightened = status
+
+
+def cell_center(obj):
+    return ((obj.real_rect_x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE,
+            (obj.real_rect_y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE)
 
 
 # at frightened mod timer stops
@@ -263,16 +258,25 @@ def stop_timer():
         change_frightened(True)
 
 
+# calculates the remaining timer time
 def how_many_time_else():
-    for i in LEVEL_TIME_CHANGE:
-        if str(game_parameters['level']) in i.split(' '):
+    for name in LEVEL_TIME_CHANGE:
+        if str(game_parameters['level']) in name.split(' '):
             break
     if game_parameters['mod'] not in [FRIGHTENED, H_FRIGHTENED]:
-        time = int(LEVEL_TIME_CHANGE[i][game_parameters['timer_num'] - 1] -
-                   (pygame.time.get_ticks() - game_parameters['mod changed time']) / 1000) * 1000
+        level = LEVEL_TIME_CHANGE[name]
+        t_n = game_parameters['timer_num'] - 1
+        if len(level) - 1 < t_n:
+            t = 0
+        else:
+            t = level[t_n]
+        time = int(t - (pygame.time.get_ticks()
+                        - game_parameters['mod changed time']) / 1000) * 1000
     else:
         time = game_parameters['stopped timer']
-    print('Chaned time:', time)
+    if time < 0:
+        time = 0
+    print('Changed time:', time)
     return time
 
 
@@ -281,11 +285,11 @@ def time_in_frightened_mod():
 
 
 # adjusts speed to get to the center of the cell
-def correct_move(obj, actions):
+def correct_move(obj, acts):
     center_x, center_y = cell_center(obj)
 
-    move_x = actions[obj.action][1]
-    move_y = actions[obj.action][0]
+    move_x = acts[obj.action][1]
+    move_y = acts[obj.action][0]
 
     next_x = (center_x + move_x) % CELL_SIZE
     next_y = (center_y + move_y) % CELL_SIZE

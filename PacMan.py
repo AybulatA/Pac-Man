@@ -31,7 +31,6 @@ class PacMan(pygame.sprite.Sprite):
         self.alive = False
         for i in enemy_group:
             i.kill()
-        self.action = None
 
     def update(self):
         score = 0
@@ -84,9 +83,9 @@ class PacMan(pygame.sprite.Sprite):
                 self.rect.x = int(self.real_rect_x)
                 self.rect.y = int(self.real_rect_y)
 
-        #helps to turn at corners
+        # helps to turn at corners
         if self.temporary_action is not None:
-            cells_passed = abs(self.rect.x - self.temporary_action[0][0]) // CELL_SIZE\
+            cells_passed = abs(self.rect.x - self.temporary_action[0][0]) // CELL_SIZE \
                            + abs(self.rect.y - self.temporary_action[0][1]) // CELL_SIZE
             if cells_passed <= 1.5:
                 if self.temporary_action[1] in possible_keys(self):
