@@ -39,7 +39,7 @@ class PacMan(pygame.sprite.Sprite):
             enemy = enemy[0]
             x = abs(enemy.rect.x - self.rect.x)
             y = abs(enemy.rect.y - self.rect.y)
-            if (position(self) == position(enemy) or (x < 15 and y < 15)) and enemy.alive is True:
+            if (position(self) == position(enemy) or (x < 25 and y < 25)) and enemy.alive:
                 if enemy.frightened:
                     game_parameters['ate ghosts'] += 1
                     sc = (2 ** game_parameters['ate ghosts']) * 200
@@ -50,8 +50,9 @@ class PacMan(pygame.sprite.Sprite):
                     score += sc
                     enemy.dead()
                 else:
-                    self.dead()
-                    self.frame = 0
+                    pass
+                    #self.dead()
+                    #self.frame = 0
 
         if self.alive is False:
             frame_speed = 0.15
@@ -102,7 +103,8 @@ class PacMan(pygame.sprite.Sprite):
         if len(pygame.sprite.spritecollide(self, energizers_group, True)) == 1:
             score += 50
             change_way()
-            stop_timer()
-            game_parameters['ate ghosts'] = -1
+            if game_parameters['level'] < 19:
+                stop_timer()
+                game_parameters['ate ghosts'] = -1
         game_parameters['score per round'] += score
         game_parameters['score'] += score

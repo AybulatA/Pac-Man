@@ -36,6 +36,7 @@ def key_click_handler(key):
         if game_obj['Stop'] is None:
             game_obj['Stop'] = Stop(10, 11, stop_group, all_sprites)
             pause_music()
+            reset_timers()
             if intro_screen is False:
                 game_parameters['stopped timer'] = how_many_time_else()
         else:
@@ -43,6 +44,7 @@ def key_click_handler(key):
                 i.kill()
             game_obj['Stop'] = None
             pygame.mixer.music.unpause()
+            game_parameters['mod changed time'] = adjust_saved_time()
             if intro_screen is False:
                 timer(game_parameters['stopped timer'],
                       event_id=CHANGE_TO_EVENT_ID[game_parameters['mod']])
@@ -68,6 +70,7 @@ def timer_event_handler(event_id):
         game_parameters['mod'] = game_parameters['saved mod']
         game_parameters['ate ghosts'] = -1
         change_frightened(False)
+        game_parameters['mod changed time'] = adjust_saved_time()
         timer(game_parameters['stopped timer'])
 
 
@@ -79,22 +82,11 @@ def update_fps():
 
 def timer(time=None, event_id=None):
     if game_obj['Stop'] is not None:
-        game_parameters['timer_num'] += 1
         return None
     if time is not None:
         pygame.time.set_timer(event_id if event_id is not None else DEFAULT_EVENT_ID, time, True)
         return None
-    for i in LEVEL_TIME_CHANGE:
-        if str(game_parameters['level']) in i.split(' '):
-            level = LEVEL_TIME_CHANGE[i]
-            t_n = game_parameters['timer_num']
-            if len(level) - 1 < t_n:
-                time = 0
-            else:
-                time = int(level[t_n] * 1000)
-            break
-    if time is None:
-        time = int(LEVEL_TIME_CHANGE['infinity'][game_parameters['timer_num']] * 1000)
+    time = level_time()
     pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
     game_parameters['mod changed time'] = pygame.time.get_ticks()
     game_parameters['timer_num'] += 1
@@ -127,12 +119,7 @@ def check_game_status(intro=False):
             game_parameters['level'] = 1
         if mod != ATTEMPT:
             kill_all_sprites()
-
-        # reset timers
-        pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
-        pygame.time.set_timer(FRIGHTENED_EVENT_ID, 0, True)
-        pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, 0, True)
-
+        reset_timers()
         param = True if mod in [ROUND_OVER, GAME_OVER] else False
         generate_level(game_parameters['map'], new_game=param)
         if GAME_OVER == mod:

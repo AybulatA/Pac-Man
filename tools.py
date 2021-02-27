@@ -248,8 +248,7 @@ def stop_timer():
     game_parameters['stopped timer'] = how_many_time_else()
     time = time_in_frightened_mod()
     game_parameters[H_FRIGHTENED] = False
-    pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, 0, True)
-    pygame.time.set_timer(FRIGHTENED_EVENT_ID, 0, True)
+    reset_timers()
     pygame.time.set_timer(FRIGHTENED_EVENT_ID, int(time), True)
     if time > 0:
         if game_parameters['mod'] not in [FRIGHTENED, H_FRIGHTENED]:
@@ -258,26 +257,35 @@ def stop_timer():
         change_frightened(True)
 
 
+def reset_timers():
+    pygame.time.set_timer(DEFAULT_EVENT_ID, 0, True)
+    pygame.time.set_timer(FRIGHTENED_EVENT_ID, 0, True)
+    pygame.time.set_timer(HALF_FRIGHTENED_EVENT_ID, 0, True)
+
+
 # calculates the remaining timer time
 def how_many_time_else():
-    for name in LEVEL_TIME_CHANGE:
-        if str(game_parameters['level']) in name.split(' '):
-            break
     if game_parameters['mod'] not in [FRIGHTENED, H_FRIGHTENED]:
-        level = LEVEL_TIME_CHANGE[name]
-        t_n = game_parameters['timer_num'] - 1
-        if len(level) - 1 < t_n:
-            t = 0
-        else:
-            t = level[t_n]
-        time = int(t - (pygame.time.get_ticks()
-                        - game_parameters['mod changed time']) / 1000) * 1000
+        time = int(level_time(aft=True) - (pygame.time.get_ticks()
+                                           - game_parameters['mod changed time']))
     else:
         time = game_parameters['stopped timer']
     if time < 0:
         time = 0
     print('Changed time:', time)
     return time
+
+
+def level_time(aft=False):
+    for name in LEVEL_TIME_CHANGE:
+        if str(game_parameters['level']) in name.split(' '):
+            break
+    level = LEVEL_TIME_CHANGE[name]
+    t_n = game_parameters['timer_num']
+    if len(level) <= t_n:
+        return 0
+    t_n -= 1 if aft else 0
+    return level[t_n] * 1000
 
 
 def time_in_frightened_mod():
@@ -329,3 +337,9 @@ def change_mod():
     else:
         game_parameters['mod'] = CHASE
     change_way()
+
+
+# in frightened mode the time is stopped, therefore it needs to be adjusted
+def adjust_saved_time():
+    level_t = level_time(aft=True)
+    return pygame.time.get_ticks() - (level_t - game_parameters['stopped timer'])
