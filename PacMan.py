@@ -50,9 +50,8 @@ class PacMan(pygame.sprite.Sprite):
                     score += sc
                     enemy.dead()
                 else:
-                    pass
-                    #self.dead()
-                    #self.frame = 0
+                    self.dead()
+                    self.frame = 0
 
         if self.alive is False:
             frame_speed = 0.15

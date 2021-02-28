@@ -39,7 +39,7 @@ LEVEL_TIME_CHANGE = {
 
 game_parameters = {
     'mod': SCATTER,
-    'level': 1212321,
+    'level': 1,
     'timer_num': 0,
     'ate ghosts': -1,
     'stopped timer': LEVEL_TIME_CHANGE['1'][0] * 1000,
