@@ -41,19 +41,22 @@ def load_sprites():
     im = load_image('right(first).png', key_path='Pac-Man')
     SPRITES['Attempts'] = pygame.transform.flip(im, True, False)
 
-    params = [('Border.jpg', BLACK), ('stop.jpg', WHITE), ('sound_on.png', WHITE),
+    params = [('Border.jpg', BLACK), ('stop.jpg', WHITE),
+              ('sound_on.png', WHITE),
               ('sound_off.png', WHITE), ('reset.png', WHITE)]
     for name, colorkey in params:
         n = name.split('.')[0]
         if n == 'Border':
             SPRITES[n] = load_image(name, key_path='game')
         else:
-            SPRITES[n] = pygame.transform.scale(load_image(name, key_path='game'),
-                                                (CELL_SIZE * 2, CELL_SIZE * 2))
+            SPRITES[n] = pygame.transform.scale(
+                load_image(name, key_path='game'),
+                (CELL_SIZE * 2, CELL_SIZE * 2))
         SPRITES[n].set_colorkey(colorkey)
 
-    SPRITES['ready!'] = pygame.transform.scale(load_image('ready!.jpg', key_path='game'),
-                                               (CELL_SIZE * 7, CELL_SIZE * 1))
+    SPRITES['ready!'] = pygame.transform.scale(
+        load_image('ready!.jpg', key_path='game'),
+        (CELL_SIZE * 7, CELL_SIZE * 1))
 
     SPRITES['points'] = list()
     p = ['200', '400', '800', '1600']
@@ -86,10 +89,12 @@ def load_pacman_sprites(sprites):
         sprites_pac['alive'][key].reverse()
 
     for sprite in sprites_pac['alive'][UP]:
-        sprites_pac['alive'][DOWN].append(pygame.transform.flip(sprite, False, True))
+        sprites_pac['alive'][DOWN].append(
+            pygame.transform.flip(sprite, False, True))
 
     for sprite in sprites_pac['alive'][RIGHT]:
-        sprites_pac['alive'][LEFT].append(pygame.transform.flip(sprite, True, False))
+        sprites_pac['alive'][LEFT].append(
+            pygame.transform.flip(sprite, True, False))
 
     for i in range(1, 12):
         n = 'dead_' + str(i) + '.png'
@@ -145,19 +150,20 @@ def load_and_resize_sprites(name):
 
 
 def resize(sprites):
+    one_half = int(CELL_SIZE * 1.5)
     for i in sprites:
         try:
             for j in sprites[i]:
                 for z in range(len(sprites[i][j])):
                     sprites[i][j][z] = pygame.transform.scale(sprites[i][j][z],
-                                                              (int(CELL_SIZE * 1.5),
-                                                               int(CELL_SIZE * 1.5)))
+                                                              (one_half,
+                                                               one_half))
                     sprites[i][j][z].set_colorkey(BLACK)
         except Exception:
             for j in range(len(sprites[i])):
                 sprites[i][j] = pygame.transform.scale(sprites[i][j],
-                                                       (int(CELL_SIZE * 1.5),
-                                                        int(CELL_SIZE * 1.5)))
+                                                       (one_half,
+                                                        one_half))
                 sprites[i][j].set_colorkey(BLACK)
 
     return sprites
@@ -197,13 +203,15 @@ def possible_keys(obj, point=None):
 
 
 def position(obj):
-    return [int((obj.rect.x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) / CELL_SIZE),
-            int((obj.rect.y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) / CELL_SIZE)]
+    return [
+        int((obj.rect.x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) / CELL_SIZE),
+        int((obj.rect.y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) / CELL_SIZE)]
 
 
 def kill_all_sprites():
     for obj in all_sprites:
-        if obj not in [game_obj['RegulateMusic'], game_obj['Reset'], game_obj['Stop']]:
+        if obj not in [game_obj['RegulateMusic'], game_obj['Reset'],
+                       game_obj['Stop']]:
             obj.kill()
 
 
@@ -239,8 +247,9 @@ def change_frightened(status):
 
 
 def cell_center(obj):
-    return ((obj.real_rect_x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE,
-            (obj.real_rect_y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE)
+    return (
+        (obj.real_rect_x + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE,
+        (obj.real_rect_y + CELL_SIZE // 4 + CELL_SIZE * 1.5 / 2) % CELL_SIZE)
 
 
 # at frightened mod timer stops
@@ -267,7 +276,8 @@ def reset_timers():
 def how_many_time_else():
     if game_parameters['mod'] not in [FRIGHTENED, H_FRIGHTENED]:
         time = int(level_time(aft=True) - (pygame.time.get_ticks()
-                                           - game_parameters['mod changed time']))
+                                           - game_parameters[
+                                               'mod changed time']))
     else:
         time = game_parameters['stopped timer']
     if time < 0:
@@ -342,4 +352,5 @@ def change_mod():
 # in frightened mode the time is stopped, therefore it needs to be adjusted
 def adjust_saved_time():
     level_t = level_time(aft=True)
-    return pygame.time.get_ticks() - (level_t - game_parameters['stopped timer'])
+    return pygame.time.get_ticks() - (
+            level_t - game_parameters['stopped timer'])

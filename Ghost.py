@@ -20,10 +20,12 @@ class Ghost(pygame.sprite.Sprite):
 
         self.name = name
         self.sprites = SPRITES[name]
-        self.image = self.sprites[game_parameters['mod']][self.action][self.frame]
+        self.image = self.sprites[game_parameters['mod']][self.action][
+            self.frame]
         self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect().move(CELL_SIZE * pos_x + CELL_SIZE // 4,
-                                               CELL_SIZE * pos_y + CELL_SIZE // 4)
+        self.rect = self.image.get_rect().move(
+            CELL_SIZE * pos_x + CELL_SIZE // 4,
+            CELL_SIZE * pos_y + CELL_SIZE // 4)
         self.real_rect_x = self.rect.x
         self.real_rect_y = self.rect.y
 
@@ -37,7 +39,8 @@ class Ghost(pygame.sprite.Sprite):
             if len(keys) == 1:
                 self.action = keys[0]
             else:
-                if position(self) in THRESHOLD and self.at_home and game_parameters['mod'] \
+                if position(self) in THRESHOLD and self.at_home and \
+                        game_parameters['mod'] \
                         not in [FRIGHTENED, H_FRIGHTENED]:
                     self.action = LEFT
                 if self.frightened and self.alive:
@@ -190,5 +193,6 @@ class Ghost(pygame.sprite.Sprite):
         if ans[0][-1] == ans[-1][-1] and len(ans) != 1:
             # if all ways have the same length, the way will be chosen by priority
             priority = [UP, LEFT, DOWN]
-            ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[0] in priority else 10)
+            ans = sorted(ans, key=lambda z: priority.index(z[0]) if z[
+                                                                        0] in priority else 10)
         return ans[0][0]

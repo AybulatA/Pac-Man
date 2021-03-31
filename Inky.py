@@ -13,7 +13,8 @@ class Inky(Ghost):
         if act in VERTICAL:
             target[0] = (-1) ** VERTICAL.index(act) * 2 + target[0]
         else:
-            target[0] += - 2 if act == UP else 0  # this is bug in the original game
+            # this is bug in the original game
+            target[0] += - 2 if act == UP else 0
             target[1] = (-1) ** HORIZONTAL.index(act) * 2 + target[1]
 
         target[0] = target[0] + (target[0] - (game_obj['Blinky'].rect.x

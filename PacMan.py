@@ -14,8 +14,9 @@ class PacMan(pygame.sprite.Sprite):
         self.temporary_action = None
         self.alive = True
 
-        self.rect = self.image.get_rect().move(CELL_SIZE * pos_x + CELL_SIZE // 4,
-                                               CELL_SIZE * pos_y - CELL_SIZE // 4)
+        self.rect = self.image.get_rect().move(
+            CELL_SIZE * pos_x + CELL_SIZE // 4,
+            CELL_SIZE * pos_y - CELL_SIZE // 4)
 
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -39,7 +40,8 @@ class PacMan(pygame.sprite.Sprite):
             enemy = enemy[0]
             x = abs(enemy.rect.x - self.rect.x)
             y = abs(enemy.rect.y - self.rect.y)
-            if (position(self) == position(enemy) or (x < 25 and y < 25)) and enemy.alive:
+            if (position(self) == position(enemy) or (
+                    x < 25 and y < 25)) and enemy.alive:
                 if enemy.frightened:
                     game_parameters['ate ghosts'] += 1
                     sc = (2 ** game_parameters['ate ghosts']) * 200
@@ -85,8 +87,10 @@ class PacMan(pygame.sprite.Sprite):
 
         # helps to turn at corners
         if self.temporary_action is not None:
-            cells_passed = abs(self.rect.x - self.temporary_action[0][0]) // CELL_SIZE \
-                           + abs(self.rect.y - self.temporary_action[0][1]) // CELL_SIZE
+            cells_passed = abs(
+                self.rect.x - self.temporary_action[0][0]) // CELL_SIZE \
+                           + abs(
+                self.rect.y - self.temporary_action[0][1]) // CELL_SIZE
             if cells_passed <= 1.5:
                 if self.temporary_action[1] in possible_keys(self):
                     self.action = self.temporary_action[1]

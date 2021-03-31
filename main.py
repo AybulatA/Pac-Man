@@ -84,7 +84,8 @@ def timer(time=None, event_id=None):
     if game_obj['Stop'] is not None:
         return None
     if time is not None:
-        pygame.time.set_timer(event_id if event_id is not None else DEFAULT_EVENT_ID, time, True)
+        pygame.time.set_timer(
+            event_id if event_id is not None else DEFAULT_EVENT_ID, time, True)
         return None
     time = level_time()
     pygame.time.set_timer(DEFAULT_EVENT_ID, time, True)
@@ -98,7 +99,8 @@ def update_level():
 
 
 def check_game_score():
-    if len(energizers_group) == len(foods_group) == 0 and game_parameters['mod'] != GAME_OVER:
+    if len(energizers_group) == len(foods_group) == 0 and game_parameters[
+        'mod'] != GAME_OVER:
         game_parameters['level'] += 1
         game_parameters['mod'] = ROUND_OVER
 
@@ -130,7 +132,8 @@ def check_game_status(intro=False):
 
 
 def score_update():
-    return font_score.render(str(game_parameters['score']), True, pygame.Color("white"))
+    return font_score.render(str(game_parameters['score']), True,
+                             pygame.Color("white"))
 
 
 def start_screen():
@@ -169,7 +172,8 @@ def draw_screen_items():
     screen.blit(update_fps(), (CELL_SIZE * 29, 0))
     screen.blit(score_update(), (int(CELL_SIZE * 28.5), CELL_SIZE * 3))
     screen.blit(update_level(), (CELL_SIZE * 28.5, CELL_SIZE * 5))
-    pygame.draw.rect(screen, BLUE, (0, 0, CELL_SIZE * 28, CELL_SIZE * 31), width=1)
+    pygame.draw.rect(screen, BLUE, (0, 0, CELL_SIZE * 28, CELL_SIZE * 31),
+                     width=1)
 
 
 def check_screen_items():

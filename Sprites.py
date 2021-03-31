@@ -16,7 +16,8 @@ class Food(pygame.sprite.Sprite):
         self.image = pygame.Surface([4, 4])
         pygame.draw.rect(self.image, FOODS_COLOR, (0, 0, 4, 4))
         self.rect = self.image.get_rect().move(
-            CELL_SIZE * pos_x + CELL_SIZE // 2 - 2, CELL_SIZE * pos_y + CELL_SIZE // 2 - 2)
+            CELL_SIZE * pos_x + CELL_SIZE // 2 - 2,
+            CELL_SIZE * pos_y + CELL_SIZE // 2 - 2)
 
 
 class Energizer(pygame.sprite.Sprite):
@@ -25,7 +26,7 @@ class Energizer(pygame.sprite.Sprite):
 
         first = pygame.Surface([CELL_SIZE, CELL_SIZE])
         pygame.draw.circle(first, FOODS_COLOR, (CELL_SIZE // 2,
-                           CELL_SIZE // 2), CELL_SIZE // 2)
+                                                CELL_SIZE // 2), CELL_SIZE // 2)
         second = pygame.Surface([CELL_SIZE, CELL_SIZE])
 
         self.frame = 0
@@ -71,8 +72,9 @@ class Points(pygame.sprite.Sprite):
 class Stop(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, gr, gr2):
         super().__init__(gr, gr2)
-        self.image = pygame.transform.scale(SPRITES['stop'], (int(CELL_SIZE) * 8,
-                                                              int(CELL_SIZE) * 8))
+        self.image = pygame.transform.scale(SPRITES['stop'],
+                                            (int(CELL_SIZE) * 8,
+                                             int(CELL_SIZE) * 8))
         self.rect = self.image.get_rect().move(
             CELL_SIZE * pos_x, CELL_SIZE * pos_y)
 
@@ -80,10 +82,12 @@ class Stop(pygame.sprite.Sprite):
 class Attempts(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, fr_gr, sec_gr):
         super().__init__(fr_gr, sec_gr)
-        self.image = pygame.transform.scale(SPRITES['Attempts'], (int(CELL_SIZE),
-                                                                  int(CELL_SIZE)))
+        self.image = pygame.transform.scale(SPRITES['Attempts'],
+                                            (int(CELL_SIZE),
+                                             int(CELL_SIZE)))
         self.rect = self.image.get_rect().move(
-            CELL_SIZE // 4 + CELL_SIZE * pos_x, CELL_SIZE // 4 + CELL_SIZE * pos_y)
+            CELL_SIZE // 4 + CELL_SIZE * pos_x,
+            CELL_SIZE // 4 + CELL_SIZE * pos_y)
 
 
 class Reset(pygame.sprite.Sprite):
@@ -91,4 +95,5 @@ class Reset(pygame.sprite.Sprite):
         super().__init__(gr)
         self.image = SPRITES['reset']
         self.rect = self.image.get_rect().move(
-            CELL_SIZE // 4 + CELL_SIZE * pos_x, CELL_SIZE // 4 + CELL_SIZE * pos_y)
+            CELL_SIZE // 4 + CELL_SIZE * pos_x,
+            CELL_SIZE // 4 + CELL_SIZE * pos_y)
